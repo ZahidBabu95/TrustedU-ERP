@@ -2,6 +2,8 @@
 setlocal
 title TrustedU ERP - Project Manager
 
+:: Set Laragon PHP Path dynamically
+set "PHP_BIN=c:\laragon\bin\php\php-8.4.12-nts-Win32-vs17-x64\php.exe"
 :menu
 cls
 echo ======================================================
@@ -29,7 +31,7 @@ cls
 echo Starting server at http://127.0.0.1:8000...
 echo.
 :: Use start /b to run in background if they prefer, but directly artisan serve is clearer for logs
-start "TrustedU-ERP-Server" php artisan serve --port=8000
+start "TrustedU-ERP-Server" "%PHP_BIN%" artisan serve --port=8000
 timeout /t 3 >nul
 start "" "http://127.0.0.1:8000"
 echo Server is running! Press any key to return to menu...
@@ -49,7 +51,7 @@ goto menu
 echo Restarting...
 taskkill /FI "WINDOWTITLE eq TrustedU-ERP-Server*" /T /F >nul 2>&1
 timeout /t 2 >nul
-start "TrustedU-ERP-Server" php artisan serve --port=8000
+start "TrustedU-ERP-Server" "%PHP_BIN%" artisan serve --port=8000
 echo Server restarted at http://127.0.0.1:8000
 timeout /t 2 >nul
 goto menu
@@ -57,10 +59,10 @@ goto menu
 :clear_cache
 cls
 echo Clearing Laravel Caches...
-php artisan view:clear
-php artisan route:clear
-php artisan config:clear
-php artisan cache:clear
+"%PHP_BIN%" artisan view:clear
+"%PHP_BIN%" artisan route:clear
+"%PHP_BIN%" artisan config:clear
+"%PHP_BIN%" artisan cache:clear
 echo.
 echo All caches cleared!
 pause

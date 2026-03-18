@@ -27,6 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->profile(\App\Filament\Pages\EditProfile::class)
             ->login(\App\Filament\Pages\Auth\Login::class)
             ->brandName('TrustEdu ERP')
             ->brandLogo(asset('assets/images/logo-color.png'))
