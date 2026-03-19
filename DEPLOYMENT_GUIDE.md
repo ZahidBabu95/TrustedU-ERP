@@ -1,48 +1,135 @@
-# TrustedU ERP — Deployment & Update Guide (cPanel)
+# 🚀 TrustedU ERP — Deployment & Update Guide
 
-এই ফাইলটি আপনাকে ভবিষ্যতে প্রজেক্ট আপডেট এবং মেইনটেইন করতে সাহায্য করবে।
+> **Last Updated:** March 19, 2026  
+> **Author:** TrustedU ERP Team  
+> **Version:** 2.0
 
 ---
 
-## 🖥️ সার্ভার ইনফর্মেশন
+## 📋 Table of Contents
 
-| বিষয় | তথ্য |
-|-------|------|
+1. [Server Information](#-server-information)
+2. [Directory Structure](#-directory-structure)
+3. [Important Files (DO NOT OVERWRITE)](#-important-files-do-not-overwrite)
+4. [Regular Code Update (Daily)](#1-regular-code-update-সাধারণ-আপডেট)
+5. [Full Update (With Packages & Migration)](#2-full-update-ফুল-আপডেট)
+6. [Public Files Update](#3-public-files-update)
+7. [Quick Reference Table](#-quick-reference-table)
+8. [Cloudflare R2 Storage](#-cloudflare-r2-storage)
+9. [First Time Setup](#-first-time-setup-নতুন-সার্ভারে)
+10. [Troubleshooting](#-troubleshooting)
+11. [Common Mistakes to Avoid](#-common-mistakes-to-avoid)
+
+---
+
+## 🖥️ Server Information
+
+| Item | Value |
+|------|-------|
 | **cPanel Host** | turbo3-bd |
-| **SSH User** | trusteduerp |
+| **SSH User** | `trusteduerp` |
+| **Domain** | `trusteduerp.com` |
 | **Project Directory** | `~/erp_core` |
 | **Public HTML** | `~/public_html` |
-| **PHP Path** | `/usr/local/bin/php` (v8.4 CLI) |
-| **Web PHP** | PHP 8.3 (ea-php83) — cPanel MultiPHP |
-| **Composer Path** | `~/composer.phar` |
+| **CLI PHP** | `/usr/local/bin/php` (v8.4) |
+| **Web PHP** | PHP 8.3 (ea-php83) via cPanel MultiPHP |
+| **Composer** | `~/composer.phar` |
 | **Git Remote** | `https://github.com/ZahidBabu95/TrustedU-ERP.git` |
+| **Git Branch** | `main` |
 
-> ⚠️ **গুরুত্বপূর্ণ:** সার্ভারে ওয়েব PHP 8.3 চলে। Composer install-এ `--ignore-platform-req=php` ফ্ল্যাগ দিতে হবে।
+> ⚠️ **PHP Version Note:** CLI তে PHP 8.4 আছে কিন্তু Web Server-এ PHP 8.3 চলে।  
+> Composer কমান্ডে সবসময় `--ignore-platform-req=php` ফ্ল্যাগ দিতে হবে।
 
 ---
 
-## ১. সাধারণ আপডেট (শুধু Code পরিবর্তন)
+## 📁 Directory Structure
 
-যখন শুধু PHP/Blade/CSS/JS কোড পরিবর্তন করেন (কোনো নতুন প্যাকেজ বা ডাটাবেস পরিবর্তন নেই):
-
-### cPanel GUI থেকে:
-1. cPanel-এ লগইন করুন
-2. **Git™ Version Control** → **Manage** → **Pull or Deploy** → **Update from Remote**
-
-### অথবা SSH Terminal থেকে:
-```bash
-cd ~/erp_core
-git pull origin main
-php artisan optimize:clear
-cp -r ~/erp_core/public/* ~/public_html/
-cp ~/erp_core/public/.htaccess ~/public_html/
+```
+/home/trusteduerp/
+├── erp_core/                 ← Laravel Project (Git Repository)
+│   ├── app/
+│   ├── bootstrap/
+│   ├── config/
+│   ├── database/
+│   ├── public/               ← Laravel-এর original public folder
+│   ├── resources/
+│   ├── routes/
+│   ├── storage/
+│   ├── vendor/
+│   ├── .env                  ← Environment Configuration
+│   ├── composer.json
+│   └── composer.lock
+│
+├── public_html/              ← Web Root (Apache serves from here)
+│   ├── index.php             ← ⚠️ CUSTOM — erp_core path দেওয়া আছে
+│   ├── .htaccess             ← ⚠️ CUSTOM — overwrite করবেন না
+│   ├── storage/              ← Symlink → ~/erp_core/storage/app/public
+│   ├── css/
+│   ├── js/
+│   ├── fonts/
+│   └── ...other assets
+│
+└── composer.phar             ← Composer executable
 ```
 
 ---
 
-## ২. ফুল আপডেট (নতুন প্যাকেজ + Migration সহ)
+## 🔴 Important Files (DO NOT OVERWRITE)
 
-যখন নতুন Composer প্যাকেজ যোগ হয় অথবা ডাটাবেস টেবিল পরিবর্তন হয়:
+### `~/public_html/index.php` — Custom Entry Point
+এই ফাইলটি customized। এটি `../erp_core/` path ব্যবহার করে। **কখনো ওভাররাইট করবেন না!**
+
+```php
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+if (file_exists($maintenance = __DIR__.'/../erp_core/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+require __DIR__.'/../erp_core/vendor/autoload.php';
+
+/** @var Application $app */
+$app = require_once __DIR__.'/../erp_core/bootstrap/app.php';
+
+$app->handleRequest(Request::capture());
+```
+
+### `~/public_html/.htaccess` — Apache Configuration
+এটিও custom হতে পারে। সাবধানে handle করুন।
+
+### `~/public_html/storage/` — Symlink
+এটি একটি symbolic link (`~/erp_core/storage/app/public` → `~/public_html/storage`)।  
+**এটি ডিলিট বা ওভাররাইট করবেন না!**
+
+---
+
+## 1️⃣ Regular Code Update (সাধারণ আপডেট)
+
+**কখন:** শুধু PHP/Blade/CSS/JS কোড পরিবর্তন হলে, কোনো নতুন প্যাকেজ বা DB পরিবর্তন নেই।
+
+### Option A: cPanel GUI থেকে
+1. cPanel → **Git™ Version Control** → **Manage**
+2. **Pull or Deploy** ট্যাব → **Update from Remote** ক্লিক
+
+### Option B: SSH Terminal থেকে
+```bash
+cd ~/erp_core
+git pull origin main
+php artisan optimize:clear
+```
+
+> **Note:** শুধু কোড পরিবর্তনে `composer install` বা `migrate` দরকার নেই।
+
+---
+
+## 2️⃣ Full Update (ফুল আপডেট)
+
+**কখন:** নতুন Composer প্যাকেজ যোগ হলে অথবা নতুন Database Migration থাকলে।
 
 ```bash
 # ১. প্রজেক্ট ফোল্ডারে যান
@@ -51,105 +138,211 @@ cd ~/erp_core
 # ২. কোড পুল করুন
 git pull origin main
 
-# ৩. নতুন প্যাকেজ ইনস্টল করুন (⚠️ --ignore-platform-req=php অবশ্যই দিন)
+# ৩. নতুন প্যাকেজ ইনস্টল করুন
+# ⚠️ --ignore-platform-req=php ফ্ল্যাগ অবশ্যই দিন (Web PHP 8.3 এর জন্য)
 php ~/composer.phar install --no-dev --optimize-autoloader --ignore-platform-req=php
 
-# ৪. ডাটাবেস মাইগ্রেশন চালান (নতুন টেবিল/কলাম থাকলে)
+# ৪. ডাটাবেস মাইগ্রেশন চালান
 php artisan migrate --force
 
 # ৫. ক্যাশ ক্লিয়ার করুন
 php artisan optimize:clear
-
-# ৬. পাবলিক ফাইল কপি করুন (নতুন CSS/JS/ছবি থাকলে)
-cp -r ~/erp_core/public/* ~/public_html/
-cp ~/erp_core/public/.htaccess ~/public_html/
 ```
 
 ---
 
-## ৩. কখন কোন কমান্ড লাগবে?
+## 3️⃣ Public Files Update
+
+**কখন:** নতুন CSS, JS, ছবি, বা Filament assets পরিবর্তন হলে।
+
+```bash
+cd ~/erp_core
+
+# ⚠️ --exclude দিয়ে index.php, .htaccess, storage কে বাদ দিন
+rsync -av --exclude='storage' --exclude='.htaccess' public/ ~/public_html/
+```
+
+### ❌ এটি ব্যবহার করবেন না:
+```bash
+# ভুল! — এটি index.php ওভাররাইট করে সাইট ডাউন করবে!
+cp -r ~/erp_core/public/* ~/public_html/
+```
+
+### ✅ যদি `rsync` না থাকে:
+```bash
+# শুধু specific ফোল্ডারগুলো কপি করুন
+cp -r ~/erp_core/public/css ~/public_html/
+cp -r ~/erp_core/public/js ~/public_html/
+cp -r ~/erp_core/public/fonts ~/public_html/
+cp -r ~/erp_core/public/images ~/public_html/ 2>/dev/null
+# ⚠️ index.php এবং .htaccess কপি করবেন না!
+```
+
+---
+
+## 📊 Quick Reference Table
 
 | পরিবর্তনের ধরন | কমান্ড |
 |----------------|--------|
-| শুধু PHP/Blade কোড | `git pull` + `php artisan optimize:clear` |
-| নতুন CSS/JS/ছবি | + `cp -r ~/erp_core/public/* ~/public_html/` |
+| শুধু PHP/Blade কোড | `git pull` → `php artisan optimize:clear` |
+| নতুন CSS/JS/Assets | + `rsync -av --exclude='storage' --exclude='.htaccess' public/ ~/public_html/` |
 | নতুন Composer প্যাকেজ | + `php ~/composer.phar install --no-dev --optimize-autoloader --ignore-platform-req=php` |
 | নতুন DB টেবিল/কলাম | + `php artisan migrate --force` |
-| Storage কনফিগারেশন | Git pull + Admin Panel → System Settings → Storage ট্যাব |
+| R2 Storage Config | Admin Panel → System Settings → Storage ট্যাব |
 
 ---
 
-## ৪. বিশেষ কমান্ড (Advanced)
+## ☁️ Cloudflare R2 Storage
 
-### Composer আপডেট (প্রথমবার বা Composer নতুন ভার্সন দরকার হলে):
+R2 credentials **ডাটাবেসে encrypted** অবস্থায় সেভ থাকে। `.env` ফাইলে কিছু দিতে হয় না।
+
+### কনফিগার করতে:
+**Admin Panel** → `/admin/system-settings` → **Storage** ট্যাব
+
+### কিভাবে কাজ করে:
+- **পুরানো ফাইল:** Local storage-এই থাকবে (`storage/app/public/`)
+- **নতুন আপলোড:** Cloudflare R2 bucket-এ যাবে → CDN URL দিয়ে serve হবে
+
+### ⚠️ গুরুত্বপূর্ণ:
+- লোকাল ও লাইভে **আলাদা DB** হলে → লাইভে আবার R2 credentials সেট করতে হবে
+- একই DB হলে → স্বয়ংক্রিয়ভাবে কাজ করবে
+
+---
+
+## 🆕 First Time Setup (নতুন সার্ভারে)
+
+নতুন সার্ভারে বা ফ্রেশ সেটআপে এই ধাপগুলো অনুসরণ করুন:
+
 ```bash
+# ১. Composer ডাউনলোড করুন
 cd ~
 curl -sS https://getcomposer.org/installer | php
-```
 
-### Storage Link তৈরি (প্রথমবারে একবার):
-```bash
+# ২. Git Clone করুন
+git clone https://github.com/ZahidBabu95/TrustedU-ERP.git erp_core
+
+# ৩. .env ফাইল তৈরি করুন
 cd ~/erp_core
+cp .env.example .env
+# .env ফাইলে DB credentials, APP_URL ইত্যাদি সেট করুন
+
+# ৪. Composer Install
+php ~/composer.phar install --no-dev --optimize-autoloader --ignore-platform-req=php
+
+# ৫. App Key Generate
+php artisan key:generate
+
+# ৬. Migration চালান
+php artisan migrate --force
+
+# ৭. Storage Link তৈরি করুন
 php artisan storage:link
-```
 
-### পারমিশন ফিক্স:
-```bash
-chmod -R 775 ~/erp_core/storage ~/erp_core/bootstrap/cache
-```
+# ৮. Permissions সেট করুন
+chmod -R 775 storage bootstrap/cache
 
-### Filament ক্যাশ রিফ্রেশ:
-```bash
-php artisan filament:optimize-clear
-php artisan icons:cache
+# ৯. public_html সেটআপ করুন
+# index.php কাস্টমাইজ করুন (উপরের "Important Files" সেকশন দেখুন)
+# Assets কপি করুন (rsync ব্যবহার করুন)
+rsync -av --exclude='storage' --exclude='.htaccess' public/ ~/public_html/
+
+# ১০. স্টোরেজ সিমলিংক public_html-এ তৈরি করুন
+ln -s ~/erp_core/storage/app/public ~/public_html/storage
+
+# ১১. Cache Optimize
+php artisan optimize:clear
 ```
 
 ---
 
-## ৫. Cloudflare R2 Storage
+## 🔧 Troubleshooting
 
-R2 স্টোরেজ ডাটাবেসে কনফিগার করা আছে। কোনো `.env` পরিবর্তন লাগবে না।
-
-- **কনফিগার করতে:** `/admin/system-settings` → **Storage** ট্যাব
-- **বর্তমান সেটিং:** Cloudflare R2 (credentials encrypted in DB)
-- **পুরানো ফাইল:** Local storage-এই থাকবে
-- **নতুন আপলোড:** R2 bucket-এ যাবে → CDN দিয়ে serve হবে
-
-> ⚠️ লাইভ সার্ভারে প্রথমবার System Settings → Storage ট্যাবে গিয়ে R2 credentials সেট করুন (যদি লোকাল ও লাইভে আলাদা DB হয়)।
-
----
-
-## ৬. মনে রাখার বিষয়
-
-- **Security:** লাইভ সাইটে `.env`-তে `APP_DEBUG=false` রাখুন
-- **DB Connection:** সমস্যা হলে `.env`-তে `DB_HOST=localhost` চেক করুন
-- **Assets দেখা যাচ্ছে না:** `php artisan storage:link` চালান
-- **পারমিশন সমস্যা:** `chmod -R 775 storage bootstrap/cache` চালান
-- **Composer not found:** `php ~/composer.phar` ব্যবহার করুন (`composer` এর বদলে)
-
----
-
-## ৭. জরুরি ট্রাবলশুটিং
-
-### ৫০০ Error:
+### 🔴 500 Internal Server Error
 ```bash
 cd ~/erp_core
-php artisan optimize:clear
-chmod -R 775 storage bootstrap/cache
+
+# ১. Laravel Error Log চেক করুন
 tail -50 storage/logs/laravel.log
+
+# ২. ক্যাশ ক্লিয়ার করুন
+php artisan optimize:clear
+
+# ৩. Permissions চেক করুন
+chmod -R 775 storage bootstrap/cache
+
+# ৪. index.php ঠিক আছে কিনা চেক করুন
+cat ~/public_html/index.php
+# '../erp_core/' path থাকতে হবে, শুধু '../' হলে ভুল!
 ```
 
-### Blank Page:
+### 🔴 Composer: PHP >= 8.4.0 Required
+```bash
+# --ignore-platform-req=php ফ্ল্যাগ দিন
+php ~/composer.phar install --no-dev --optimize-autoloader --ignore-platform-req=php
+```
+
+### 🔴 Composer: Command Not Found
+```bash
+# Composer ডাউনলোড করুন
+cd ~
+curl -sS https://getcomposer.org/installer | php
+# তারপর php ~/composer.phar ব্যবহার করুন
+```
+
+### 🔴 Blank Page / White Screen
 ```bash
 php artisan view:clear
 php artisan config:clear
+php artisan route:clear
+tail -20 storage/logs/laravel.log
 ```
 
-### Migration Error:
+### 🔴 Assets (CSS/JS) লোড হচ্ছে না
+```bash
+cd ~/erp_core
+rsync -av --exclude='storage' --exclude='.htaccess' public/ ~/public_html/
+```
+
+### 🔴 Storage / Uploaded Files দেখা যাচ্ছে না
+```bash
+# Storage link চেক করুন
+ls -la ~/public_html/storage
+# এটি ~/erp_core/storage/app/public এ point করা উচিত
+
+# যদি না থাকে, তৈরি করুন:
+ln -s ~/erp_core/storage/app/public ~/public_html/storage
+```
+
+### 🔴 Migration Error
 ```bash
 php artisan migrate:status    # কোন migration পেন্ডিং দেখুন
 php artisan migrate --force   # চালান
 ```
 
 ---
-*Last Updated: March 19, 2026 — TrustedU ERP Team* 🚀
+
+## ⛔ Common Mistakes to Avoid
+
+| ❌ ভুল | ✅ সঠিক |
+|--------|---------|
+| `cp -r ~/erp_core/public/* ~/public_html/` | `rsync -av --exclude='storage' --exclude='.htaccess' public/ ~/public_html/` |
+| `composer install` (without flag) | `php ~/composer.phar install --ignore-platform-req=php` |
+| `~/public_html/index.php` ওভাররাইট করা | **কখনো ওভাররাইট করবেন না!** এতে `../erp_core/` path আছে |
+| `~/public_html/storage/` ডিলিট করা | এটি symlink — ডিলিট করলে uploads ভেঙে যাবে |
+| `.env`-তে `APP_DEBUG=true` রাখা (production) | সবসময় `APP_DEBUG=false` রাখুন |
+
+---
+
+## 📝 চেকলিস্ট (প্রতিটি Deploy-এর জন্য)
+
+- [ ] `git pull origin main` করেছি
+- [ ] `composer install` লাগলে `--ignore-platform-req=php` সহ চালিয়েছি
+- [ ] `php artisan migrate --force` লাগলে চালিয়েছি
+- [ ] `php artisan optimize:clear` চালিয়েছি
+- [ ] Assets পরিবর্তন থাকলে `rsync` দিয়ে কপি করেছি (index.php বাদে!)
+- [ ] সাইট ব্রাউজারে চেক করেছি
+- [ ] `.env`-তে `APP_DEBUG=false` আছে
+
+---
+
+*Happy Deploying! 🚀 — TrustedU ERP Team*
