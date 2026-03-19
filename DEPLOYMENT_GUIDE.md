@@ -12,9 +12,12 @@
 | **SSH User** | trusteduerp |
 | **Project Directory** | `~/erp_core` |
 | **Public HTML** | `~/public_html` |
-| **PHP Path** | `/usr/local/bin/php` (v8.4) |
+| **PHP Path** | `/usr/local/bin/php` (v8.4 CLI) |
+| **Web PHP** | PHP 8.3 (ea-php83) — cPanel MultiPHP |
 | **Composer Path** | `~/composer.phar` |
 | **Git Remote** | `https://github.com/ZahidBabu95/TrustedU-ERP.git` |
+
+> ⚠️ **গুরুত্বপূর্ণ:** সার্ভারে ওয়েব PHP 8.3 চলে। Composer install-এ `--ignore-platform-req=php` ফ্ল্যাগ দিতে হবে।
 
 ---
 
@@ -48,8 +51,8 @@ cd ~/erp_core
 # ২. কোড পুল করুন
 git pull origin main
 
-# ৩. নতুন প্যাকেজ ইনস্টল করুন (composer.lock পরিবর্তন হলে অবশ্যই)
-php ~/composer.phar install --no-dev --optimize-autoloader
+# ৩. নতুন প্যাকেজ ইনস্টল করুন (⚠️ --ignore-platform-req=php অবশ্যই দিন)
+php ~/composer.phar install --no-dev --optimize-autoloader --ignore-platform-req=php
 
 # ৪. ডাটাবেস মাইগ্রেশন চালান (নতুন টেবিল/কলাম থাকলে)
 php artisan migrate --force
@@ -70,7 +73,7 @@ cp ~/erp_core/public/.htaccess ~/public_html/
 |----------------|--------|
 | শুধু PHP/Blade কোড | `git pull` + `php artisan optimize:clear` |
 | নতুন CSS/JS/ছবি | + `cp -r ~/erp_core/public/* ~/public_html/` |
-| নতুন Composer প্যাকেজ | + `php ~/composer.phar install --no-dev --optimize-autoloader` |
+| নতুন Composer প্যাকেজ | + `php ~/composer.phar install --no-dev --optimize-autoloader --ignore-platform-req=php` |
 | নতুন DB টেবিল/কলাম | + `php artisan migrate --force` |
 | Storage কনফিগারেশন | Git pull + Admin Panel → System Settings → Storage ট্যাব |
 
