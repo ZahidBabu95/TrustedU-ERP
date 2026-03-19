@@ -16,12 +16,12 @@ class ClientResource extends Resource
     protected static ?string $model = Client::class;
 
     public static function getNavigationIcon(): string|\BackedEnum|null { return 'heroicon-o-building-office-2'; }
-    
-    public static function getNavigationGroup(): ?string { return 'Site Content'; }
+    public static function getNavigationGroup(): ?string { return 'CRM'; }
 
-    protected static ?string $label = 'Institutes';
-    
-    protected static ?string $pluralLabel = 'Institutes';
+    protected static ?string $label = 'Client';
+    protected static ?string $pluralLabel = 'Clients';
+    protected static ?string $navigationLabel = 'Clients';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {
@@ -35,9 +35,7 @@ class ClientResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -47,5 +45,11 @@ class ClientResource extends Resource
             'create' => Pages\CreateClient::route('/create'),
             'edit' => Pages\EditClient::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->teamScoped();
     }
 }

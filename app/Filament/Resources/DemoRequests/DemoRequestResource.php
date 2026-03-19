@@ -19,7 +19,8 @@ class DemoRequestResource extends Resource
     protected static ?string $model = DemoRequest::class;
 
     public static function getNavigationIcon(): string|\BackedEnum|null { return \Filament\Support\Icons\Heroicon::OutlinedPresentationChartBar; }
-    public static function getNavigationGroup(): ?string { return 'Inquiries'; }
+    public static function getNavigationGroup(): ?string { return 'Website CMS'; }
+    protected static ?int $navigationSort = 6;
 
     public static function getNavigationBadge(): ?string
     {

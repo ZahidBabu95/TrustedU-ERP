@@ -1,0 +1,586 @@
+/* ============================================================
+   TrustedU ERP — Premium SaaS Theme v2.0
+   Inspired by Stripe, Linear, Notion, HubSpot
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ─── Design System Tokens ───────────────────────────────── */
+:root {
+    /* Brand */
+    --brand: #6c5ce7;
+    --brand-dark: #5a4bd1;
+    --brand-light: #a78bfa;
+    --brand-glow: rgba(108,92,231,0.12);
+    --brand-subtle: rgba(108,92,231,0.05);
+
+    /* Surfaces */
+    --bg-canvas: #f8f9fb;
+    --bg-card: #ffffff;
+    --bg-sidebar: #ffffff;
+    --bg-hover: #f5f4ff;
+    --bg-active: linear-gradient(135deg, rgba(108,92,231,0.1) 0%, rgba(108,92,231,0.04) 100%);
+
+    /* Borders */
+    --border: #e8eaed;
+    --border-light: #f1f3f5;
+    --border-focus: #6c5ce7;
+
+    /* Text */
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --text-brand: #6c5ce7;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -4px rgba(0,0,0,0.04);
+    --shadow-glow: 0 0 0 3px rgba(108,92,231,0.1);
+
+    /* Radius */
+    --r: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-2xl: 20px;
+
+    /* Other */
+    --sidebar-w: 252px;
+    --topbar-h: 56px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Global Reset ────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+body, .fi-main, .fi-sidebar, .fi-topbar,
+input, select, textarea, button {
+    font-family: var(--font) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.fi-body { background: var(--bg-canvas) !important; }
+
+/* ═══════════════════════════════════════════════════════════
+   SIDEBAR — Clean, Compact, Premium
+   ═══════════════════════════════════════════════════════════ */
+.fi-sidebar {
+    background: var(--bg-sidebar) !important;
+    border-right: 1px solid var(--border-light) !important;
+    box-shadow: none !important;
+    width: var(--sidebar-w) !important;
+    transition: all 0.3s var(--ease) !important;
+    z-index: 40 !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+    scrollbar-color: #e5e7eb transparent;
+}
+.fi-sidebar::-webkit-scrollbar { width: 3px; }
+.fi-sidebar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+
+/* Logo Area */
+.fi-sidebar-header {
+    padding: 0.6rem 0.85rem !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    background: transparent !important;
+    height: auto !important;
+    min-height: unset !important;
+}
+.fi-sidebar-header img,
+.fi-sidebar-header .fi-logo {
+    max-height: 1.8rem !important;
+    width: auto !important;
+}
+
+/* Kill ALL Gaps — Nuclear approach */
+.fi-sidebar-nav, .fi-sidebar nav,
+.fi-sidebar-nav > ul, .fi-sidebar nav > ul,
+.fi-sidebar ul, .fi-sidebar ol,
+.fi-sidebar-group ul {
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.fi-sidebar-nav > ul, .fi-sidebar nav > ul {
+    padding: 0.35rem 0 !important;
+}
+.fi-sidebar-nav > ul > li, .fi-sidebar nav > ul > li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Group wrapper */
+.fi-sidebar-group {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    gap: 0 !important;
+}
+
+/* Group separator line between groups */
+.fi-sidebar-group + .fi-sidebar-group {
+    margin-top: 0.15rem !important;
+    padding-top: 0.15rem !important;
+    border-top: 1px solid var(--border-light) !important;
+}
+
+/* GROUP LABEL (CRM, Management, Website CMS, Platform) */
+.fi-sidebar-group-label {
+    color: var(--text-muted) !important;
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    padding: 0.5rem 0.9rem 0.2rem !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1 !important;
+    display: block !important;
+}
+
+/* GROUP TOGGLE BUTTON */
+.fi-sidebar-group-button {
+    border-radius: 6px !important;
+    margin: 1px 0.5rem !important;
+    padding: 0.38rem 0.55rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    color: var(--text-secondary) !important;
+    background: transparent !important;
+    transition: all 0.15s var(--ease) !important;
+    white-space: nowrap !important;
+    min-height: unset !important;
+    height: auto !important;
+    line-height: 1.4 !important;
+    gap: 0.5rem !important;
+}
+.fi-sidebar-group-button:hover {
+    background: var(--bg-hover) !important;
+    color: var(--brand) !important;
+}
+.fi-sidebar-group-button[aria-expanded="true"] {
+    color: var(--brand) !important;
+    font-weight: 600 !important;
+}
+
+/* Group button icons */
+.fi-sidebar-group-button svg:first-child {
+    width: 16px !important; height: 16px !important; min-width: 16px !important;
+    opacity: 0.45 !important;
+    transition: all 0.15s var(--ease) !important;
+}
+.fi-sidebar-group-button:hover svg:first-child,
+.fi-sidebar-group-button[aria-expanded="true"] svg:first-child {
+    opacity: 0.85 !important;
+    color: var(--brand) !important;
+}
+
+/* Chevron */
+.fi-sidebar-group-button svg:last-child {
+    width: 13px !important; height: 13px !important;
+    opacity: 0.3 !important;
+    transition: all 0.2s var(--ease) !important;
+}
+.fi-sidebar-group-button:hover svg:last-child { opacity: 0.5 !important; }
+
+/* ── NAV ITEMS ────────────────────────────────────────────── */
+.fi-sidebar-item { margin: 0 !important; padding: 0 !important; }
+
+.fi-sidebar-item-button,
+.fi-sidebar-item a {
+    border-radius: 6px !important;
+    margin: 1px 0.5rem !important;
+    padding: 0.38rem 0.55rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 400 !important;
+    color: var(--text-secondary) !important;
+    background: transparent !important;
+    transition: all 0.15s var(--ease) !important;
+    min-height: unset !important;
+    height: auto !important;
+    line-height: 1.4 !important;
+    gap: 0.5rem !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    position: relative !important;
+}
+.fi-sidebar-item-button:hover,
+.fi-sidebar-item a:hover {
+    background: var(--bg-hover) !important;
+    color: var(--brand) !important;
+}
+
+/* Active — subtle brand tint */
+.fi-sidebar-item-button.fi-active,
+.fi-sidebar-item-button[aria-current="page"],
+.fi-sidebar-item a.fi-active,
+.fi-sidebar-item a[data-active="true"] {
+    background: var(--bg-active) !important;
+    color: var(--text-brand) !important;
+    font-weight: 600 !important;
+}
+
+/* Active left indicator */
+.fi-sidebar-item-button.fi-active::before,
+.fi-sidebar-item a.fi-active::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 5px !important;
+    bottom: 5px !important;
+    width: 3px !important;
+    border-radius: 0 3px 3px 0 !important;
+    background: var(--brand) !important;
+    animation: indicatorSlide 0.2s var(--spring) !important;
+}
+@keyframes indicatorSlide {
+    from { transform: scaleY(0); } to { transform: scaleY(1); }
+}
+
+/* Icons */
+.fi-sidebar-item-icon,
+.fi-sidebar-item-button svg:first-child {
+    width: 16px !important; height: 16px !important; min-width: 16px !important;
+    opacity: 0.45 !important;
+    transition: all 0.15s var(--ease) !important;
+}
+.fi-sidebar-item-button:hover svg:first-child,
+.fi-sidebar-item a:hover svg:first-child {
+    opacity: 0.8 !important;
+}
+.fi-sidebar-item-button.fi-active svg:first-child,
+.fi-sidebar-item a.fi-active svg:first-child {
+    opacity: 1 !important;
+    color: var(--brand) !important;
+}
+
+/* SUB-ITEMS (indented within groups) */
+.fi-sidebar-group-items {
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.fi-sidebar-group-items .fi-sidebar-item-button,
+.fi-sidebar-group-items .fi-sidebar-item a {
+    padding-left: 2.2rem !important;
+    font-size: 0.76rem !important;
+    color: var(--text-muted) !important;
+    padding-top: 0.32rem !important;
+    padding-bottom: 0.32rem !important;
+}
+.fi-sidebar-group-items .fi-sidebar-item-button:hover,
+.fi-sidebar-group-items .fi-sidebar-item a:hover {
+    color: var(--brand) !important;
+    background: var(--bg-hover) !important;
+}
+.fi-sidebar-group-items .fi-sidebar-item-button.fi-active,
+.fi-sidebar-group-items .fi-sidebar-item a.fi-active {
+    color: var(--text-brand) !important;
+    background: var(--bg-active) !important;
+    font-weight: 600 !important;
+}
+.fi-sidebar-group-items .fi-sidebar-item-icon,
+.fi-sidebar-group-items svg:first-child {
+    width: 14px !important; height: 14px !important; min-width: 14px !important;
+}
+
+/* Sidebar Footer */
+.fi-sidebar-footer {
+    border-top: 1px solid var(--border-light) !important;
+    padding: 0.4rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOPBAR — Glass morphism
+   ═══════════════════════════════════════════════════════════ */
+.fi-topbar {
+    background: rgba(255,255,255,0.92) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    box-shadow: var(--shadow-xs) !important;
+    height: var(--topbar-h) !important;
+    min-height: unset !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 30 !important;
+    overflow: visible !important;
+}
+
+/* Topbar inner container — flex row */
+.fi-topbar > * {
+    overflow: visible !important;
+}
+.fi-topbar nav, .fi-topbar > div, .fi-topbar header {
+    overflow: visible !important;
+}
+
+/* Make sure topbar nav items are in a row and centered */
+.fi-topbar-actions, .fi-topbar nav > div {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    overflow: visible !important;
+}
+
+/* x-cloak support for Alpine.js */
+[x-cloak] { display: none !important; }
+
+/* Dropdown panels from topbar */
+[style*="z-index:9999"] {
+    z-index: 9999 !important;
+}
+
+/* Search */
+.fi-global-search input {
+    background: var(--bg-canvas) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r) !important;
+    font-size: 0.78rem !important;
+    transition: all 0.2s var(--ease) !important;
+}
+.fi-global-search input:focus {
+    border-color: var(--border-focus) !important;
+    box-shadow: var(--shadow-glow) !important;
+    background: #fff !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTENT AREA — Full Width
+   ═══════════════════════════════════════════════════════════ */
+.fi-main { background: var(--bg-canvas) !important; }
+
+.fi-main-ctn, .fi-page .fi-page-content, .fi-page > div,
+.fi-section-content-ctn, .fi-header-ctn, main > div,
+.fi-page-content > div, .container, .mx-auto {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+.fi-page { padding: 1.25rem 1.75rem !important; }
+
+.fi-header-heading {
+    font-weight: 800 !important;
+    font-size: 1.5rem !important;
+    color: var(--text-primary) !important;
+    letter-spacing: -0.03em !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CARDS — Soft rounded with subtle border
+   ═══════════════════════════════════════════════════════════ */
+.fi-wi-stats-overview-stat {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r-xl) !important;
+    box-shadow: var(--shadow-sm) !important;
+    padding: 1.3rem !important;
+    transition: all 0.25s var(--ease) !important;
+}
+.fi-wi-stats-overview-stat:hover {
+    box-shadow: var(--shadow-md) !important;
+    transform: translateY(-2px) !important;
+}
+.fi-wi-stats-overview-stat-label {
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    color: var(--text-muted) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+}
+.fi-wi-stats-overview-stat-value {
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+    letter-spacing: -0.02em !important;
+}
+
+.fi-section, .fi-card, .fi-wi-table {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r-xl) !important;
+    box-shadow: var(--shadow-sm) !important;
+    overflow: hidden !important;
+}
+.fi-section-header-heading {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TABLES — Premium design
+   ═══════════════════════════════════════════════════════════ */
+.fi-ta-table {
+    border-radius: var(--r-xl) !important;
+    overflow: hidden !important;
+}
+.fi-ta-table thead th {
+    background: #fafafb !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    color: var(--text-muted) !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 0.7rem 1rem !important;
+}
+.fi-ta-table tbody tr {
+    transition: background 0.15s var(--ease) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+}
+.fi-ta-table tbody tr:hover {
+    background: var(--bg-hover) !important;
+}
+.fi-ta-table tbody td {
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+    padding: 0.75rem 1rem !important;
+    border: none !important;
+}
+/* Checkbox column */
+.fi-ta-table tbody td:first-child,
+.fi-ta-table thead th:first-child {
+    padding-left: 1.25rem !important;
+}
+/* Actions column */
+.fi-ta-table tbody td:last-child,
+.fi-ta-table thead th:last-child {
+    padding-right: 1.25rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BADGES
+   ═══════════════════════════════════════════════════════════ */
+.fi-badge {
+    border-radius: 999px !important;
+    font-size: 0.62rem !important;
+    font-weight: 600 !important;
+    padding: 0.2rem 0.6rem !important;
+    letter-spacing: 0.02em !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════════════ */
+.fi-btn-primary, .fi-btn-color-primary {
+    background: var(--brand) !important;
+    border: none !important;
+    color: #fff !important;
+    border-radius: var(--r) !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    box-shadow: 0 1px 3px rgba(108,92,231,0.25) !important;
+    transition: all 0.2s var(--ease) !important;
+}
+.fi-btn-primary:hover, .fi-btn-color-primary:hover {
+    background: var(--brand-dark) !important;
+    box-shadow: 0 4px 12px rgba(108,92,231,0.3) !important;
+    transform: translateY(-1px) !important;
+}
+.fi-btn-primary:active, .fi-btn-color-primary:active {
+    transform: translateY(0) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FORMS
+   ═══════════════════════════════════════════════════════════ */
+.fi-fo-field-wrp input, .fi-fo-field-wrp select,
+.fi-fo-field-wrp textarea, .fi-input {
+    border-radius: var(--r) !important;
+    border: 1px solid var(--border) !important;
+    font-size: 0.82rem !important;
+    transition: all 0.2s var(--ease) !important;
+    background: #fff !important;
+}
+.fi-fo-field-wrp input:focus, .fi-fo-field-wrp textarea:focus, .fi-input:focus {
+    border-color: var(--border-focus) !important;
+    box-shadow: var(--shadow-glow) !important;
+    outline: none !important;
+}
+/* Form labels */
+.fi-fo-field-wrp label {
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    color: var(--text-secondary) !important;
+}
+/* Validation error */
+.fi-fo-field-wrp .fi-fo-field-wrp-error-message {
+    font-size: 0.72rem !important;
+    color: #ef4444 !important;
+    font-weight: 500 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGINATION
+   ═══════════════════════════════════════════════════════════ */
+.fi-pagination button {
+    border-radius: 6px !important;
+    font-size: 0.76rem !important;
+    transition: all 0.15s var(--ease) !important;
+}
+.fi-pagination [aria-current] {
+    background: var(--brand) !important;
+    color: #fff !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   AVATAR
+   ═══════════════════════════════════════════════════════════ */
+.fi-user-avatar {
+    background: linear-gradient(135deg, var(--brand), var(--brand-light)) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    border-radius: 50% !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL / NOTIFICATION
+   ═══════════════════════════════════════════════════════════ */
+.fi-modal-window {
+    border-radius: var(--r-xl) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border: 1px solid var(--border) !important;
+}
+.fi-no {
+    border-radius: var(--r-lg) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SMOOTH TRANSITIONS
+   ═══════════════════════════════════════════════════════════ */
+.fi-main-ctn {
+    animation: fadeUp 0.25s var(--ease) !important;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+    .fi-sidebar {
+        position: fixed !important;
+        left: 0 !important; top: 0 !important; bottom: 0 !important;
+        z-index: 50 !important;
+        box-shadow: var(--shadow-lg) !important;
+        width: 260px !important;
+    }
+    .fi-main { margin-left: 0 !important; width: 100% !important; }
+    .fi-page { padding: 1rem !important; }
+}
+
+@media (max-width: 640px) {
+    .fi-header-heading { font-size: 1.15rem !important; }
+    .fi-ta-table thead th { font-size: 0.58rem !important; padding: 0.5rem 0.6rem !important; }
+    .fi-ta-table tbody td { font-size: 0.72rem !important; padding: 0.5rem 0.6rem !important; }
+    .fi-topbar { height: 48px !important; }
+}

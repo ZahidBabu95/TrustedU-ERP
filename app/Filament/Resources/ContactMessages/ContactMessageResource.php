@@ -19,7 +19,8 @@ class ContactMessageResource extends Resource
     protected static ?string $model = ContactMessage::class;
 
     public static function getNavigationIcon(): string|\BackedEnum|null { return \Filament\Support\Icons\Heroicon::OutlinedEnvelope; }
-    public static function getNavigationGroup(): ?string { return 'Inquiries'; }
+    public static function getNavigationGroup(): ?string { return 'Website CMS'; }
+    protected static ?int $navigationSort = 5;
 
     public static function getNavigationBadge(): ?string
     {

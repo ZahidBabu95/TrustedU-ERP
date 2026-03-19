@@ -19,7 +19,8 @@ class TestimonialResource extends Resource
     protected static ?string $model = Testimonial::class;
 
     public static function getNavigationIcon(): string|\BackedEnum|null { return \Filament\Support\Icons\Heroicon::OutlinedChatBubbleLeftRight; }
-    public static function getNavigationGroup(): ?string { return 'Landing Page'; }
+    public static function getNavigationGroup(): ?string { return 'Website CMS'; }
+    protected static ?int $navigationSort = 9;
 
     public static function form(Schema $schema): Schema
     {

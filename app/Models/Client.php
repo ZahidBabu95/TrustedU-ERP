@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasTeamScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 class Client extends Model
 {
+    use HasTeamScope;
+
     protected $fillable = [
         'name', 'logo', 'website', 'institution_type',
-        'district',
+        'district', 'team_id',
         'is_featured', 'is_active', 'sort_order',
     ];
 

@@ -19,7 +19,8 @@ class HeroSectionResource extends Resource
     protected static ?string $model = HeroSection::class;
 
     public static function getNavigationIcon(): string|\BackedEnum|null { return \Filament\Support\Icons\Heroicon::OutlinedPhoto; }
-    public static function getNavigationGroup(): ?string { return 'Landing Page'; }
+    public static function getNavigationGroup(): ?string { return 'Website CMS'; }
+    protected static ?int $navigationSort = 8;
 
     public static function form(Schema $schema): Schema
     {

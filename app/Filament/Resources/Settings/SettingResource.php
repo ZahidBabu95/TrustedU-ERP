@@ -19,6 +19,11 @@ class SettingResource extends Resource
     protected static ?string $model = Setting::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationGroup(): ?string { return 'Website CMS'; }
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $label = 'Website Setting';
+    protected static ?string $pluralLabel = 'Website Settings';
 
     protected static ?string $recordTitleAttribute = 'label';
 

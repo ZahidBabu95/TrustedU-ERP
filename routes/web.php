@@ -27,3 +27,22 @@ Route::middleware('throttle:10,1')->group(function () {
     Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
     Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo.store');
 });
+
+// ── Impersonation ──
+Route::middleware('auth')->get('/admin/stop-impersonating', [App\Http\Controllers\ImpersonationController::class, 'stopImpersonating'])
+    ->name('impersonation.stop');
+
+// ── Notification Count API (internal, session auth) ──
+Route::middleware('auth')->get('/admin/api/notification-count', function () {
+    $user = auth()->user();
+    $unreadCount = \App\Models\AppNotification::where('user_id', $user->id)->whereNull('read_at')->count();
+    $latest = \App\Models\AppNotification::where('user_id', $user->id)
+        ->whereNull('read_at')
+        ->orderByDesc('created_at')
+        ->first(['id', 'title', 'message', 'action_url', 'type', 'color']);
+
+    return response()->json([
+        'unread_count' => $unreadCount,
+        'latest' => $latest,
+    ]);
+});

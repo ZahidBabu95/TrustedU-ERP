@@ -19,7 +19,8 @@ class BlogPostResource extends Resource
     protected static ?string $model = BlogPost::class;
 
     public static function getNavigationIcon(): string|\BackedEnum|null { return \Filament\Support\Icons\Heroicon::OutlinedDocumentText; }
-    public static function getNavigationGroup(): ?string { return 'Blog'; }
+    public static function getNavigationGroup(): ?string { return 'Website CMS'; }
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {

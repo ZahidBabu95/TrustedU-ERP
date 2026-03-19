@@ -19,7 +19,8 @@ class ErpModuleResource extends Resource
     protected static ?string $model = ErpModule::class;
 
     public static function getNavigationIcon(): string|\BackedEnum|null { return \Filament\Support\Icons\Heroicon::OutlinedSquares2x2; }
-    public static function getNavigationGroup(): ?string { return 'Landing Page'; }
+    public static function getNavigationGroup(): ?string { return 'Website CMS'; }
+    protected static ?int $navigationSort = 7;
 
     public static function form(Schema $schema): Schema
     {
