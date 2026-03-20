@@ -27,16 +27,7 @@ class ViewUser extends ViewRecord
                     && $this->record->id !== Auth::id()
                     && !$this->record->isSuperAdmin()
                 )
-                ->requiresConfirmation()
-                ->modalHeading('Login as ' . ($this->record->name ?? 'User') . '?')
-                ->modalDescription('You will be logged in as this user. Use "Back to Super Admin" bar to return.')
-                ->modalSubmitActionLabel('Login As This User')
-                ->action(function () {
-                    session()->put('impersonator_id', Auth::id());
-                    session()->put('impersonator_name', Auth::user()->name);
-                    Auth::login($this->record);
-                    $this->redirect('/admin');
-                }),
+                ->url(fn () => route('impersonation.start', $this->record)),
         ];
     }
 }

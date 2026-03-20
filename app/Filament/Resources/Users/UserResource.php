@@ -278,7 +278,7 @@ class UserResource extends Resource
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                // Login As — Impersonate
+                // Login As — Impersonate (direct link, avoids Livewire session issues)
                 Action::make('impersonate')
                     ->label('Login As')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
@@ -288,16 +288,7 @@ class UserResource extends Resource
                         && $record->id !== Auth::id()
                         && !$record->isSuperAdmin()
                     )
-                    ->requiresConfirmation()
-                    ->modalHeading(fn ($record) => 'Login as ' . $record->name . '?')
-                    ->modalDescription('You will be logged in as this user. You can return to your account anytime.')
-                    ->modalSubmitActionLabel('Login As This User')
-                    ->action(function ($record) {
-                        session()->put('impersonator_id', Auth::id());
-                        session()->put('impersonator_name', Auth::user()->name);
-                        Auth::login($record);
-                        redirect('/admin');
-                    }),
+                    ->url(fn ($record) => route('impersonation.start', $record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -29,8 +29,10 @@ Route::middleware('throttle:10,1')->group(function () {
     Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo.store');
 });
 
-// ── Impersonation ──
-Route::middleware('auth')->get('/admin/stop-impersonating', [App\Http\Controllers\ImpersonationController::class, 'stopImpersonating'])
+// ── Impersonation (outside /admin to avoid Filament route conflicts) ──
+Route::middleware('auth')->get('/impersonate/{user}', [App\Http\Controllers\ImpersonationController::class, 'startImpersonating'])
+    ->name('impersonation.start');
+Route::middleware('auth')->get('/stop-impersonating', [App\Http\Controllers\ImpersonationController::class, 'stopImpersonating'])
     ->name('impersonation.stop');
 
 // ── Notification Count API (internal, session auth) ──
