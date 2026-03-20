@@ -1,8 +1,8 @@
 # 🚀 TrustedU ERP — Deployment & Update Guide
 
-> **Last Updated:** March 19, 2026  
+> **Last Updated:** March 20, 2026  
 > **Author:** TrustedU ERP Team  
-> **Version:** 2.0
+> **Version:** 2.1
 
 ---
 
