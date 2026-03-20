@@ -33,10 +33,9 @@ class SystemSettings extends Page
 
     public function mount(): void
     {
-        // Seed defaults if empty
-        if (SystemSetting::count() === 0) {
-            SystemSetting::seedDefaults();
-        }
+        // Seed/sync defaults — uses firstOrCreate, so safe to call always.
+        // This ensures newly added settings are available even on existing installs.
+        SystemSetting::seedDefaults();
 
         // Load all settings into form data
         $settings = SystemSetting::all();
