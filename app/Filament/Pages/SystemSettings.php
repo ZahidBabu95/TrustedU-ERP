@@ -387,6 +387,30 @@ class SystemSettings extends Page
                                         ]),
                                     ]),
                             ]),
+
+                        // ─── INTEGRATIONS ───
+                        Tab::make('Integrations')
+                            ->icon('heroicon-o-puzzle-piece')
+                            ->schema([
+                                Section::make('Google Analytics')
+                                    ->description('Configure Google Analytics 4 (GA4) to track website visitors, page views, and custom events. Get your Measurement ID from analytics.google.com')
+                                    ->schema([
+                                        Grid::make(['md' => 2])->schema([
+                                            Toggle::make('ga_enabled')
+                                                ->label('Enable Google Analytics')
+                                                ->helperText('Turn on/off GA4 tracking on the public website'),
+                                            Toggle::make('ga_track_events')
+                                                ->label('Track Custom Events')
+                                                ->helperText('Track button clicks, form submissions, module views'),
+                                        ]),
+                                        TextInput::make('ga_measurement_id')
+                                            ->label('Measurement ID')
+                                            ->placeholder('G-XXXXXXXXXX')
+                                            ->helperText('Your GA4 Measurement ID. Find it in Google Analytics → Admin → Data Streams → Web')
+                                            ->prefix('ID')
+                                            ->maxLength(20),
+                                    ]),
+                            ]),
                     ])
                     ->columnSpanFull()
                     ->persistTabInQueryString(),

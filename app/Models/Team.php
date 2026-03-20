@@ -58,9 +58,10 @@ class Team extends Model
         return $this->hasMany(Task::class);
     }
 
-    public function clients(): HasMany
+    public function clients(): BelongsToMany
     {
-        return $this->hasMany(Client::class);
+        return $this->belongsToMany(Client::class, 'client_team')
+            ->withTimestamps();
     }
 
     public function supportTickets(): HasMany

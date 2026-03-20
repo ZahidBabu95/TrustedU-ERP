@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Clients;
 
 use App\Filament\Resources\Clients\Pages;
+use App\Filament\Resources\Clients\RelationManagers\MonthlyStatsRelationManager;
 use App\Models\Client;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -35,7 +36,9 @@ class ClientResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            MonthlyStatsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
@@ -43,6 +46,7 @@ class ClientResource extends Resource
         return [
             'index' => Pages\ListClients::route('/'),
             'create' => Pages\CreateClient::route('/create'),
+            'view' => Pages\ViewClient::route('/{record}'),
             'edit' => Pages\EditClient::route('/{record}/edit'),
         ];
     }

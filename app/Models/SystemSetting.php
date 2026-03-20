@@ -214,6 +214,11 @@ class SystemSetting extends Model
             ['group' => 'security', 'key' => 'max_login_attempts', 'label' => 'Max Login Attempts', 'value' => '5', 'type' => 'number', 'sort_order' => 6],
             ['group' => 'security', 'key' => 'two_factor_enabled', 'label' => '2FA Enabled', 'value' => '0', 'type' => 'toggle', 'sort_order' => 7],
             ['group' => 'security', 'key' => 'force_ssl', 'label' => 'Force SSL', 'value' => '0', 'type' => 'toggle', 'sort_order' => 8],
+
+            // ── Integrations (Google Analytics) ──
+            ['group' => 'integrations', 'key' => 'ga_enabled', 'label' => 'Enable Google Analytics', 'value' => '0', 'type' => 'toggle', 'sort_order' => 1],
+            ['group' => 'integrations', 'key' => 'ga_measurement_id', 'label' => 'Measurement ID', 'value' => null, 'type' => 'text', 'sort_order' => 2],
+            ['group' => 'integrations', 'key' => 'ga_track_events', 'label' => 'Track Custom Events', 'value' => '1', 'type' => 'toggle', 'sort_order' => 3],
         ];
 
         foreach ($defaults as $setting) {

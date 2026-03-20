@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Leads\Schemas;
 
+use App\Models\Lead;
 use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -20,49 +21,57 @@ class LeadForm
                 ->schema([
                     TextInput::make('name')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->prefixIcon('heroicon-o-user'),
+                    TextInput::make('company')
+                        ->maxLength(255)
+                        ->placeholder('Company / Organization')
+                        ->prefixIcon('heroicon-o-building-office'),
                     TextInput::make('email')
                         ->email()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->prefixIcon('heroicon-o-envelope'),
                     TextInput::make('phone')
                         ->tel()
-                        ->maxLength(30),
+                        ->maxLength(30)
+                        ->prefixIcon('heroicon-o-phone'),
                     Select::make('source')
-                        ->options([
-                            'web'       => '🌐 Website',
-                            'referral'  => '🤝 Referral',
-                            'social'    => '📱 Social Media',
-                            'cold_call' => '📞 Cold Call',
-                            'email'     => '📧 Email',
-                            'other'     => '📌 Other',
-                        ])
-                        ->default('web'),
+                        ->options(Lead::SOURCE_LABELS)
+                        ->default('web')
+                        ->native(false)
+                        ->prefixIcon('heroicon-o-signal'),
+                    Select::make('priority')
+                        ->options(Lead::PRIORITY_LABELS)
+                        ->default('medium')
+                        ->native(false)
+                        ->prefixIcon('heroicon-o-flag'),
                 ]),
 
             Section::make('Status & Assignment')
                 ->columns(2)
                 ->schema([
                     Select::make('status')
-                        ->options([
-                            'new'       => 'New',
-                            'contacted' => 'Contacted',
-                            'qualified' => 'Qualified',
-                            'proposal'  => 'Proposal Sent',
-                            'won'       => '✅ Won',
-                            'lost'      => '❌ Lost',
-                        ])
-                        ->default('new'),
+                        ->options(Lead::STATUS_LABELS)
+                        ->default('new')
+                        ->native(false),
                     Select::make('assigned_to')
                         ->label('Assign To')
                         ->options(User::pluck('name', 'id'))
                         ->searchable()
-                        ->preload(),
+                        ->preload()
+                        ->prefixIcon('heroicon-o-user-circle'),
                     TextInput::make('value')
                         ->numeric()
                         ->prefix('৳')
                         ->label('Lead Value'),
                     DatePicker::make('expected_close_date')
-                        ->label('Expected Close Date'),
+                        ->label('Expected Close Date')
+                        ->native(false)
+                        ->prefixIcon('heroicon-o-calendar'),
+                    TextInput::make('label')
+                        ->maxLength(100)
+                        ->placeholder('e.g. Hot Lead, Review Needed')
+                        ->prefixIcon('heroicon-o-tag'),
                 ]),
 
             Section::make('Notes')

@@ -103,6 +103,24 @@
             box-shadow: 0 1px 32px rgba(15,23,42,.08);
         }
 
+        /* ── Module tab micro-interactions ─────────────────── */
+        .module-tab {
+            position: relative;
+            overflow: hidden;
+        }
+        .module-tab::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(37,99,235,.1), rgba(79,70,229,.08));
+            opacity: 0;
+            transition: opacity .3s ease;
+            border-radius: inherit;
+        }
+        .module-tab:hover::before {
+            opacity: 1;
+        }
+
         /* ── AOS pointer fix ────────────────────────────────── */
         [data-aos] { pointer-events: none; }
         .aos-animate { pointer-events: auto; }
@@ -213,15 +231,42 @@
             animation: roadmap-bg 12s ease infinite;
         }
 
-        /* ── Section wave separator ───────────────────────────── */
-        .section-wave { line-height: 0; overflow: hidden; }
-        .section-wave svg { display: block; width: 100%; }
+        /* ── Animated wave separator (Hero → Partners) ──────── */
+        @keyframes wave-flow {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animated-wave {
+            will-change: transform;
+        }
+        .wave-back  { animation: wave-flow 8s linear infinite; }
+        .wave-mid   { animation: wave-flow 6s linear infinite; }
+        .wave-front { animation: wave-flow 4s linear infinite; }
 
         /* ── CTA section — distinct from footer ──────────────── */
         .cta-section {
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #0c1a3e 70%, #0f172a 100%);
         }
     </style>
+
+    {{-- ═══════════════════ Google Analytics 4 ═══════════════════ --}}
+    @php
+        $gaEnabled = \App\Models\SystemSetting::get('ga_enabled', false);
+        $gaMeasurementId = \App\Models\SystemSetting::get('ga_measurement_id');
+    @endphp
+    @if($gaEnabled && $gaMeasurementId)
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaMeasurementId }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ $gaMeasurementId }}', {
+            page_title: document.title,
+            page_location: window.location.href,
+            send_page_view: true
+        });
+    </script>
+    @endif
 </head>
 <body class="antialiased overflow-x-hidden">
 
@@ -393,5 +438,93 @@
     </script>
 
     @stack('scripts')
+
+    {{-- ═══════════════════ GA4 Custom Event Tracking ═══════════════════ --}}
+    @php
+        $gaTrackEvents = \App\Models\SystemSetting::get('ga_track_events', false);
+    @endphp
+    @if($gaEnabled && $gaMeasurementId && $gaTrackEvents)
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Helper: safe gtag event
+        function trackEvent(eventName, params) {
+            if (typeof gtag === 'function') {
+                gtag('event', eventName, params);
+            }
+        }
+
+        // ── Track "Book a Demo" button clicks ──
+        document.querySelectorAll('a[href*="demo"], a[href*="Demo"]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                trackEvent('demo_request_click', {
+                    event_category: 'engagement',
+                    event_label: btn.textContent.trim(),
+                    link_url: btn.href
+                });
+            });
+        });
+
+        // ── Track Contact Form submissions ──
+        var contactForm = document.querySelector('form[action*="contact"]');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function() {
+                trackEvent('contact_form_submit', {
+                    event_category: 'conversion',
+                    event_label: 'Contact Form'
+                });
+            });
+        }
+
+        // ── Track Demo Form submissions ──
+        var demoForm = document.querySelector('form[action*="demo"]');
+        if (demoForm) {
+            demoForm.addEventListener('submit', function() {
+                trackEvent('demo_form_submit', {
+                    event_category: 'conversion',
+                    event_label: 'Demo Request Form'
+                });
+            });
+        }
+
+        // ── Track Module card clicks (landing page) ──
+        document.querySelectorAll('.module-card').forEach(function(card) {
+            card.addEventListener('click', function() {
+                var moduleName = card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : 'Unknown';
+                trackEvent('module_view', {
+                    event_category: 'content',
+                    event_label: moduleName,
+                    module_name: moduleName
+                });
+            });
+        });
+
+        // ── Track "Sign In" clicks ──
+        document.querySelectorAll('a[href*="login"], a[href*="admin"]').forEach(function(link) {
+            link.addEventListener('click', function() {
+                trackEvent('sign_in_click', {
+                    event_category: 'engagement',
+                    event_label: link.textContent.trim()
+                });
+            });
+        });
+
+        // ── Track scroll depth (25%, 50%, 75%, 100%) ──
+        var scrollMarks = {25: false, 50: false, 75: false, 100: false};
+        window.addEventListener('scroll', function() {
+            var scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+            [25, 50, 75, 100].forEach(function(mark) {
+                if (scrollPercent >= mark && !scrollMarks[mark]) {
+                    scrollMarks[mark] = true;
+                    trackEvent('scroll_depth', {
+                        event_category: 'engagement',
+                        event_label: mark + '% scrolled',
+                        value: mark
+                    });
+                }
+            });
+        });
+    });
+    </script>
+    @endif
 </body>
 </html>

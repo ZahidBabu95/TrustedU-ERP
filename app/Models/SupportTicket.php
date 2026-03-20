@@ -17,10 +17,54 @@ class SupportTicket extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'resolved_at'  => 'datetime',
-        'last_reply_at' => 'datetime',
-        'closed_at'    => 'datetime',
+        'resolved_at'      => 'datetime',
+        'last_reply_at'    => 'datetime',
+        'closed_at'        => 'datetime',
+        'labels'           => 'array',
+        'notify_requester' => 'boolean',
     ];
+
+    // ── Constants ──
+
+    public const STATUS_LABELS = [
+        'open'        => 'Open',
+        'in_progress' => 'In Progress',
+        'resolved'    => 'Resolved',
+        'closed'      => 'Closed',
+    ];
+
+    public const STATUS_COLORS = [
+        'open'        => '#3b82f6',
+        'in_progress' => '#eab308',
+        'resolved'    => '#22c55e',
+        'closed'      => '#94a3b8',
+    ];
+
+    public const PRIORITY_LABELS = [
+        'low'    => 'Low',
+        'medium' => 'Medium',
+        'high'   => 'High',
+        'urgent' => 'Urgent',
+    ];
+
+    public const PRIORITY_COLORS = [
+        'low'    => '#94a3b8',
+        'medium' => '#3b82f6',
+        'high'   => '#f97316',
+        'urgent' => '#ef4444',
+    ];
+
+    public const CATEGORY_LABELS = [
+        'technical'  => 'Technical Support',
+        'billing'    => 'Billing & Invoices',
+        'access'     => 'Account Access',
+        'feature'    => 'Feature Request',
+        'bug'        => 'Bug Report',
+        'general'    => 'General Inquiry',
+        'onboarding' => 'Onboarding Help',
+    ];
+
+    // ── Boot ──
 
     protected static function booted(): void
     {
@@ -119,23 +163,11 @@ class SupportTicket extends Model
 
     public function getPriorityColorAttribute(): string
     {
-        return match ($this->priority) {
-            'low'    => '#94a3b8',
-            'medium' => '#3b82f6',
-            'high'   => '#f97316',
-            'urgent' => '#ef4444',
-            default  => '#94a3b8',
-        };
+        return self::PRIORITY_COLORS[$this->priority] ?? '#94a3b8';
     }
 
     public function getStatusColorAttribute(): string
     {
-        return match ($this->status) {
-            'open'        => '#3b82f6',
-            'in_progress' => '#eab308',
-            'resolved'    => '#22c55e',
-            'closed'      => '#94a3b8',
-            default       => '#94a3b8',
-        };
+        return self::STATUS_COLORS[$this->status] ?? '#94a3b8';
     }
 }

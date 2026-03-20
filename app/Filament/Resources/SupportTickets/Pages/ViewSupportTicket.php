@@ -6,25 +6,19 @@ use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use App\Models\SupportTicket;
 use Filament\Actions;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\Page;
+use Filament\Resources\Pages\ViewRecord;
 use Livewire\WithFileUploads;
 
-class ViewSupportTicket extends Page
+class ViewSupportTicket extends ViewRecord
 {
     use WithFileUploads;
 
     protected static string $resource = SupportTicketResource::class;
     protected string $view = 'filament.pages.support-ticket-view';
 
-    public SupportTicket $record;
     public string $replyMessage = '';
     public $replyAttachment = null;
     public bool $isInternal = false;
-
-    public function mount(int|string $record): void
-    {
-        $this->record = SupportTicket::with(['messages.sender', 'client', 'assignee'])->findOrFail($record);
-    }
 
     public function getTitle(): string
     {

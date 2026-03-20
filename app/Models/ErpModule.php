@@ -4,18 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class ErpModule extends Model
 {
     protected $fillable = [
-        'name', 'slug', 'icon', 'description',
-        'features', 'color', 'is_active', 'sort_order',
+        'name', 'slug', 'icon', 'description', 'long_description',
+        'features', 'youtube_videos', 'color', 'is_active', 'sort_order',
     ];
 
     protected $casts = [
-        'features'  => 'array',
-        'is_active' => 'boolean',
+        'features'       => 'array',
+        'youtube_videos' => 'array',
+        'is_active'      => 'boolean',
     ];
 
     protected static function booted(): void
@@ -25,6 +27,13 @@ class ErpModule extends Model
                 $module->slug = Str::slug($module->name);
             }
         });
+    }
+
+    public function clients(): BelongsToMany
+    {
+        return $this->belongsToMany(Client::class, 'client_erp_module')
+            ->withPivot(['activated_at', 'is_active'])
+            ->withTimestamps();
     }
 
     public function scopeActive(Builder $query): Builder

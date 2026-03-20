@@ -39,6 +39,7 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
             ->maxContentWidth(\Filament\Support\Enums\Width::Full)
+            ->globalSearch(false)
             ->renderHook('panels::head.end', fn () => '
                 <link rel="stylesheet" href="' . asset('css/admin-custom.css') . '?v=' . filemtime(public_path('css/admin-custom.css')) . '">
             ')

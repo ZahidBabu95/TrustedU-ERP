@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Leads\Tables;
 
+use App\Models\Lead;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -21,7 +22,8 @@ class LeadsTable
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->description(fn ($record) => $record->company),
                 TextColumn::make('email')
                     ->searchable()
                     ->copyable(),
@@ -30,13 +32,24 @@ class LeadsTable
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'new'       => 'gray',
-                        'contacted' => 'warning',
-                        'qualified' => 'primary',
-                        'proposal'  => 'info',
-                        'won'       => 'success',
-                        'lost'      => 'danger',
-                        default     => 'gray',
+                        'new'          => 'gray',
+                        'contacted'    => 'warning',
+                        'qualified'    => 'primary',
+                        'proposal'     => 'info',
+                        'negotiation'  => 'primary',
+                        'won'          => 'success',
+                        'lost'         => 'danger',
+                        default        => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state) => Lead::STATUS_LABELS[$state] ?? $state),
+                TextColumn::make('priority')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'low'    => 'success',
+                        'medium' => 'warning',
+                        'high'   => 'danger',
+                        'urgent' => 'danger',
+                        default  => 'gray',
                     }),
                 TextColumn::make('value')
                     ->money('BDT')
@@ -45,7 +58,8 @@ class LeadsTable
                     ->label('Assigned To')
                     ->sortable(),
                 TextColumn::make('source')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn (string $state) => Lead::SOURCE_LABELS[$state] ?? $state),
                 TextColumn::make('expected_close_date')
                     ->date()
                     ->sortable(),
@@ -57,23 +71,11 @@ class LeadsTable
             ->filters([
                 TrashedFilter::make(),
                 SelectFilter::make('status')
-                    ->options([
-                        'new'       => 'New',
-                        'contacted' => 'Contacted',
-                        'qualified' => 'Qualified',
-                        'proposal'  => 'Proposal Sent',
-                        'won'       => 'Won',
-                        'lost'      => 'Lost',
-                    ]),
+                    ->options(Lead::STATUS_LABELS),
                 SelectFilter::make('source')
-                    ->options([
-                        'web'       => 'Website',
-                        'referral'  => 'Referral',
-                        'social'    => 'Social Media',
-                        'cold_call' => 'Cold Call',
-                        'email'     => 'Email',
-                        'other'     => 'Other',
-                    ]),
+                    ->options(Lead::SOURCE_LABELS),
+                SelectFilter::make('priority')
+                    ->options(Lead::PRIORITY_LABELS),
             ])
             ->recordActions([
                 EditAction::make(),

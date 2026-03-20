@@ -184,10 +184,19 @@
         </div>
     </div>
 
-    {{-- Wave section separator --}}
-    <div class="section-wave absolute bottom-0 left-0 w-full pointer-events-none">
-        <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="height:60px">
-            <path d="M0,30 C180,60 360,0 540,30 C720,60 900,0 1080,30 C1260,60 1380,20 1440,30 L1440,60 L0,60 Z" fill="#ffffff" opacity="1"/>
+    {{-- Animated wave section separator --}}
+    <div class="absolute bottom-0 left-0 w-full pointer-events-none" style="height:80px; overflow:hidden;">
+        {{-- Wave layer 1 (back, slowest) --}}
+        <svg class="animated-wave wave-back absolute bottom-0 left-0 w-[200%] h-full" viewBox="0 0 2880 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0,40 C120,65 240,15 360,40 C480,65 600,15 720,40 C840,65 960,15 1080,40 C1200,65 1320,15 1440,40 C1560,65 1680,15 1800,40 C1920,65 2040,15 2160,40 C2280,65 2400,15 2520,40 C2640,65 2760,15 2880,40 L2880,80 L0,80 Z" fill="rgba(255,255,255,0.3)"/>
+        </svg>
+        {{-- Wave layer 2 (middle) --}}
+        <svg class="animated-wave wave-mid absolute bottom-0 left-0 w-[200%] h-full" viewBox="0 0 2880 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0,45 C160,70 320,20 480,45 C640,70 800,20 960,45 C1120,70 1280,20 1440,45 C1600,70 1760,20 1920,45 C2080,70 2240,20 2400,45 C2560,70 2720,20 2880,45 L2880,80 L0,80 Z" fill="rgba(255,255,255,0.5)"/>
+        </svg>
+        {{-- Wave layer 3 (front, fastest) --}}
+        <svg class="animated-wave wave-front absolute bottom-0 left-0 w-[200%] h-full" viewBox="0 0 2880 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0,50 C200,75 400,25 600,50 C800,75 1000,25 1200,50 C1400,75 1600,25 1800,50 C2000,75 2200,25 2400,50 C2600,75 2800,25 2880,50 L2880,80 L0,80 Z" fill="#ffffff"/>
         </svg>
     </div>
 </section>
@@ -267,7 +276,7 @@
                 @php
                     $pair     = $colorPairs[$idx % count($colorPairs)];
                     $initials = collect(explode(' ', $client->name))->take(2)->map(fn($w) => strtoupper($w[0] ?? ''))->implode('');
-                    $logoUrl  = $client->logo ? Storage::url($client->logo) : '';
+                    $logoUrl  = $client->logo_url ?? '';
                     $clientName = addslashes($client->name);
                     $idx++;
                 @endphp
@@ -401,14 +410,36 @@
 </div>
 
 {{-- ══════════════════════════════════════════════════════
-     §3  MODULES / FEATURES
+     §3  MODULES / FEATURES  (Tabbed)
 ══════════════════════════════════════════════════════ --}}
-<section id="modules" class="py-28 bg-white relative overflow-hidden">
+@php
+    // Categorise modules by name keywords
+    $catMap = [
+        'academic'  => ['Student','Exam','Attendance','Learning','LMS','OMR','Online Admission','Admission','TC and Drop'],
+        'financial' => ['Fees','Dues','Fee Collection','Financial','Accounts','Payroll','HRM','Leave'],
+        'admin'     => ['User','Role','Access','Library','Hostel','Assets','Inventory','Transport','SMS'],
+        'tech'      => ['Mobile App','Dynamic website','Transport Tracking'],
+    ];
+    $moduleList = $modules->map(function($m) use ($catMap) {
+        $cat = 'academic';
+        foreach ($catMap as $key => $keywords) {
+            foreach ($keywords as $kw) {
+                if (stripos($m->name, $kw) !== false) { $cat = $key; break 2; }
+            }
+        }
+        $m->_category = $cat;
+        return $m;
+    });
+    $tabCounts = ['all' => $moduleList->count()];
+    foreach(['academic','financial','admin','tech'] as $c) $tabCounts[$c] = $moduleList->where('_category',$c)->count();
+@endphp
+<section id="modules" class="py-28 bg-white relative overflow-hidden"
+         x-data="{ activeTab: 'all' }">
     {{-- Subtle grid --}}
     <div class="absolute inset-0 opacity-[0.025]" style="background-image: linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg,#94a3b8 1px, transparent 1px); background-size: 60px 60px;"></div>
 
     <div class="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
-        <div class="text-center max-w-2xl mx-auto mb-20" data-aos="fade-up">
+        <div class="text-center max-w-2xl mx-auto mb-12" data-aos="fade-up">
             <span class="inline-block px-4 py-1.5 bg-blue-50 text-blue-700 text-[11px] font-bold uppercase tracking-widest rounded-full border border-blue-100 mb-5">Enterprise Library</span>
             <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-5 leading-tight">
                 Smart ERP<br>
@@ -417,18 +448,35 @@
             <p class="text-slate-500 text-lg">A complete suite of modules designed specifically for Cantonment educational institutions.</p>
         </div>
 
+        {{-- Category Tabs --}}
+        <div class="flex flex-wrap justify-center gap-2 mb-14" data-aos="fade-up" data-aos-delay="80">
+            @foreach([
+                'all'       => ['All Modules',   '🔷', $tabCounts['all']],
+                'academic'  => ['Academic',       '🎓', $tabCounts['academic']],
+                'financial' => ['Financial & HR', '💰', $tabCounts['financial']],
+                'admin'     => ['Admin & Infra',  '🏛', $tabCounts['admin']],
+                'tech'      => ['Technology',     '📱', $tabCounts['tech']],
+            ] as $tabKey => [$tabLabel, $tabIcon, $tabCount])
+            <button @click="activeTab = '{{ $tabKey }}'"
+                    class="module-tab relative px-5 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-300 border"
+                    :class="activeTab === '{{ $tabKey }}'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/25'
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50'">
+                <span class="mr-1.5">{{ $tabIcon }}</span>{{ $tabLabel }}
+                <span class="ml-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold"
+                      :class="activeTab === '{{ $tabKey }}' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">{{ $tabCount }}</span>
+            </button>
+            @endforeach
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            @forelse($modules as $i => $module)
+            @forelse($moduleList as $i => $module)
             @php
                 $gradients = [
-                    'blue'   => ['#2563eb','#3b82f6'],
-                    'indigo' => ['#4f46e5','#818cf8'],
-                    'purple' => ['#7c3aed','#a78bfa'],
-                    'red'    => ['#dc2626','#f87171'],
-                    'orange' => ['#d97706','#fb923c'],
-                    'green'  => ['#059669','#34d399'],
-                    'teal'   => ['#0d9488','#5eead4'],
-                    'cyan'   => ['#0284c7','#38bdf8'],
+                    'blue'   => ['#2563eb','#3b82f6'], 'indigo' => ['#4f46e5','#818cf8'],
+                    'purple' => ['#7c3aed','#a78bfa'], 'red'    => ['#dc2626','#f87171'],
+                    'orange' => ['#d97706','#fb923c'], 'green'  => ['#059669','#34d399'],
+                    'teal'   => ['#0d9488','#5eead4'], 'cyan'   => ['#0284c7','#38bdf8'],
                 ];
                 $g = $gradients[$module->color] ?? $gradients['blue'];
                 $iconMap = [
@@ -455,7 +503,12 @@
                 ];
                 $path = $iconMap[$module->name] ?? 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
             @endphp
-            <div class="module-card group relative rounded-2xl border border-slate-100 bg-white p-6 overflow-hidden cursor-pointer"
+            <a href="{{ route('module.show', $module->slug) }}"
+               x-show="activeTab === 'all' || activeTab === '{{ $module->_category }}'"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 class="module-card group relative rounded-2xl border border-slate-100 bg-white p-6 overflow-hidden cursor-pointer block no-underline"
                  data-aos="fade-up" data-aos-delay="{{ ($i % 4) * 60 }}"
                  style="transition: border-color 0.3s ease;">
                 {{-- Hover gradient --}}
@@ -474,20 +527,29 @@
                 <p class="relative z-10 text-[13px] text-slate-500 leading-relaxed mb-4">{{ Str::limit($module->description, 90) }}</p>
 
                 @if($module->features && is_array($module->features))
-                <div class="relative z-10 flex flex-wrap gap-1.5">
+                <div class="relative z-10 flex flex-wrap gap-1.5 mb-3">
                     @foreach(array_slice($module->features, 0, 3) as $feat)
                     <span class="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[10px] font-semibold text-slate-600 uppercase tracking-wide">{{ $feat }}</span>
                     @endforeach
                 </div>
                 @endif
 
-                {{-- Arrow indicator --}}
-                <div class="absolute bottom-5 right-5 w-8 h-8 rounded-full bg-slate-50 group-hover:bg-blue-50 border border-slate-100 group-hover:border-blue-200 flex items-center justify-center transition-all duration-300">
-                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                    </svg>
+                {{-- Video count & Arrow --}}
+                <div class="relative z-10 flex items-center justify-between mt-2">
+                    @if($module->youtube_videos && count($module->youtube_videos) > 0)
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 border border-red-100 text-[10px] font-bold text-red-500">
+                        📹 {{ count($module->youtube_videos) }} {{ count($module->youtube_videos) === 1 ? 'Video' : 'Videos' }}
+                    </span>
+                    @else
+                    <span></span>
+                    @endif
+                    <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-blue-50 border border-slate-100 group-hover:border-blue-200 flex items-center justify-center transition-all duration-300">
+                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </div>
                 </div>
-            </div>
+            </a>
             @empty
             @endforelse
         </div>
@@ -559,6 +621,45 @@
         </div>
     </div>
 </section>
+
+{{-- ══════════════════════════════════════════════════════
+     §4b  WHY CHOOSE US
+══════════════════════════════════════════════════════ --}}
+<section class="py-24 bg-white relative overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.02]" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 40px 40px;"></div>
+    <div class="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
+        <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
+            <span class="inline-block px-4 py-1.5 bg-indigo-50 text-indigo-700 text-[11px] font-bold uppercase tracking-widest rounded-full border border-indigo-100 mb-5">Why TrustedU</span>
+            <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-5 leading-tight">
+                Built for <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-600">Excellence</span>
+            </h2>
+            <p class="text-slate-500 text-lg">What sets TrustedU ERP apart from traditional management systems</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach([
+                ['🏛','Army Authorized','Official authorization from Bangladesh Army HQ ensures top-tier security compliance and institutional trust.','from-blue-600 to-indigo-600','border-blue-100'],
+                ['☁️','Cloud Native','Deployed on enterprise-grade cloud infrastructure with auto-scaling, ensuring 99.8% uptime across all campuses.','from-cyan-500 to-blue-600','border-cyan-100'],
+                ['🔒','Bank-Grade Security','End-to-end encryption, role-based access control, and regular security audits protect sensitive student data.','from-violet-600 to-purple-600','border-violet-100'],
+                ['📱','Mobile First','Dedicated Android apps for teachers, students, and parents — access everything on the go.','from-green-500 to-emerald-600','border-green-100'],
+                ['🔄','Real-time Sync','Live data synchronization across 63 institutions ensures every campus operates on the latest information.','from-amber-500 to-orange-600','border-amber-100'],
+                ['📊','Smart Analytics','AI-powered dashboards and reports help administrators make data-driven decisions for better outcomes.','from-rose-500 to-pink-600','border-rose-100'],
+            ] as $i => [$icon,$title,$desc,$gradient,$borderClr])
+            <div class="group relative p-7 rounded-2xl border {{ $borderClr }} bg-white hover:shadow-2xl hover:shadow-blue-500/8 hover:-translate-y-1 transition-all duration-500 overflow-hidden"
+                 data-aos="fade-up" data-aos-delay="{{ $i * 80 }}">
+                <div class="absolute inset-0 rounded-2xl bg-gradient-to-br {{ $gradient }} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500"></div>
+                <div class="relative z-10">
+                    <div class="text-3xl mb-5">{{ $icon }}</div>
+                    <h3 class="text-lg font-extrabold text-slate-900 mb-3 group-hover:text-blue-700 transition-colors">{{ $title }}</h3>
+                    <p class="text-[14px] text-slate-500 leading-relaxed">{{ $desc }}</p>
+                </div>
+                <div class="absolute -bottom-6 -right-6 w-20 h-20 rounded-full bg-gradient-to-br {{ $gradient }} opacity-5 group-hover:opacity-10 group-hover:scale-150 transition-all duration-700"></div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+
 
 {{-- ══════════════════════════════════════════════════════
      §5  ROADMAP

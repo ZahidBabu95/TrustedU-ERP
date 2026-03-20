@@ -296,20 +296,58 @@ input, select, textarea, button {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   TOPBAR — Glass morphism
+   GLOBAL — Remove Filament ring/outline borders from layout
+   Tailwind v4 uses @property with inherits:false, so CSS
+   variable overrides don't cascade. Must override box-shadow
+   directly on each element to remove the ring borders.
+   ═══════════════════════════════════════════════════════════ */
+html, 
+body,
+.fi-body,
+.fi-topbar,
+.fi-topbar-ctn,
+.fi-sidebar,
+.fi-sidebar.fi-sidebar-open,
+.fi-sidebar-header,
+.fi-layout,
+.fi-main-ctn,
+.fi-main {
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+/* Nuke any border/pill shape from topbar ends and pseudo-elements */
+.fi-topbar-end,
+.fi-topbar-start,
+.fi-topbar-nav,
+.fi-topbar::before,
+.fi-topbar::after,
+.fi-topbar-end::before,
+.fi-topbar-end::after,
+.fi-topbar-end > *,
+.fi-topbar-end > *::before,
+.fi-topbar-end > *::after {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOPBAR — Glass morphism, Premium
    ═══════════════════════════════════════════════════════════ */
 .fi-topbar {
-    background: rgba(255,255,255,0.92) !important;
-    backdrop-filter: blur(16px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-    border-bottom: 1px solid var(--border-light) !important;
-    box-shadow: var(--shadow-xs) !important;
+    background: rgba(255,255,255,0.95) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
     height: var(--topbar-h) !important;
     min-height: unset !important;
     position: sticky !important;
     top: 0 !important;
     z-index: 30 !important;
     overflow: visible !important;
+    /* box-shadow and outline already removed by global override above */
 }
 
 /* Topbar inner container — flex row */
@@ -324,7 +362,7 @@ input, select, textarea, button {
 .fi-topbar-actions, .fi-topbar nav > div {
     display: flex !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 6px !important;
     overflow: visible !important;
 }
 
@@ -336,18 +374,45 @@ input, select, textarea, button {
     z-index: 9999 !important;
 }
 
-/* Search */
-.fi-global-search input {
-    background: var(--bg-canvas) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: var(--r) !important;
-    font-size: 0.78rem !important;
-    transition: all 0.2s var(--ease) !important;
+/* HIDE Filament Global Search (we use our own dashboard search) */
+.fi-global-search-ctn,
+.fi-global-search,
+[class*="fi-global-search"] {
+    display: none !important;
 }
-.fi-global-search input:focus {
-    border-color: var(--border-focus) !important;
-    box-shadow: var(--shadow-glow) !important;
-    background: #fff !important;
+
+/* Topbar Logo alignment fix */
+.fi-topbar .fi-sidebar-header,
+.fi-topbar .fi-logo {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* ── Custom Team Switcher & Notification SVG sizing ── */
+/* Prevent Filament's Tailwind sizing from blowing up our inline-styled SVGs */
+.fi-topbar-end > div > div svg,
+.fi-topbar-end > div > div > button svg {
+    max-width: 24px !important;
+    max-height: 24px !important;
+}
+/* Filament's own icon-button SVGs in topbar should remain unaffected */
+.fi-topbar-end .fi-icon-btn svg {
+    max-width: unset !important;
+    max-height: unset !important;
+}
+
+/* User menu button polish */
+.fi-user-menu {
+    display: flex !important;
+    align-items: center !important;
+}
+.fi-user-menu > button {
+    border-radius: 10px !important;
+    padding: 4px 8px !important;
+    transition: all 0.15s ease !important;
+}
+.fi-user-menu > button:hover {
+    background: var(--bg-hover) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -355,9 +420,11 @@ input, select, textarea, button {
    ═══════════════════════════════════════════════════════════ */
 .fi-main { background: var(--bg-canvas) !important; }
 
-.fi-main-ctn, .fi-page .fi-page-content, .fi-page > div,
+.fi-main-ctn, .fi-main, .fi-page .fi-page-content, .fi-page > div,
 .fi-section-content-ctn, .fi-header-ctn, main > div,
-.fi-page-content > div, .container, .mx-auto {
+.fi-page-content > div, .container, .mx-auto,
+.fi-main.fi-width-full, .fi-main.fi-width-7xl,
+.fi-main[class*="fi-width"], div.fi-main {
     max-width: 100% !important;
     width: 100% !important;
 }
