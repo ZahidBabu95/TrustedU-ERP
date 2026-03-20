@@ -73,11 +73,6 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(2),
 
                 // ── Website CMS: extra items ──
-                NavigationItem::make('Website Dashboard')
-                    ->url(fn () => route('filament.admin.pages.dashboard'))
-                    ->icon('heroicon-o-computer-desktop')
-                    ->group('Website CMS')
-                    ->sort(1),
 
                 NavigationItem::make('Visit Website')
                     ->url('/')
