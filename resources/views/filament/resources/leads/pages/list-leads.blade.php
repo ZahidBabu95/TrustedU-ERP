@@ -186,13 +186,31 @@
                                     @endif
                                 </div>
 
-                                {{-- Convert Button for Negotiation --}}
+                                {{-- Win/Lose buttons for Negotiation stage --}}
                                 @if($status === 'negotiation')
-                                    <button class="kb-convert-btn" wire:click="updateLeadStatus({{ $lead->id }}, 'won')">
-                                        <x-heroicon-o-check-badge style="width: 14px; height: 14px;" />
-                                        Convert to Won
-                                    </button>
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                                        <button class="kb-convert-btn" style="flex: 1; background: #ecfdf5; color: #059669;"
+                                                draggable="false"
+                                                onclick="event.stopPropagation(); event.preventDefault(); $wire.updateLeadStatus({{ $lead->id }}, 'won')">
+                                            <x-heroicon-o-trophy style="width: 14px; height: 14px;" />
+                                            Won
+                                        </button>
+                                        <button class="kb-convert-btn" style="flex: 1; background: #fef2f2; color: #ef4444;"
+                                                draggable="false"
+                                                onclick="event.stopPropagation(); event.preventDefault(); $wire.updateLeadStatus({{ $lead->id }}, 'lost')">
+                                            <x-heroicon-o-x-circle style="width: 14px; height: 14px;" />
+                                            Lost
+                                        </button>
+                                    </div>
                                 @endif
+
+                                {{-- Create Deal button — visible on all active statuses --}}
+                                <button class="kb-convert-btn" style="background: #eef2ff; color: #4f46e5; margin-top: 0.5rem;"
+                                        draggable="false"
+                                        onclick="event.stopPropagation(); event.preventDefault(); $wire.convertLeadToDeal({{ $lead->id }})">
+                                    <x-heroicon-o-rocket-launch style="width: 14px; height: 14px;" />
+                                    → Create Deal
+                                </button>
                             </div>
                         @endforeach
 

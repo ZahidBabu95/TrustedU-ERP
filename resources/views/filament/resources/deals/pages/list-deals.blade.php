@@ -1,4 +1,4 @@
-ূ<x-filament-panels::page>
+<x-filament-panels::page>
     @php
         $dealsByStage = $this->getDealsByStage();
         $stats = $this->getKanbanStats();
@@ -205,16 +205,28 @@
                                 @if($stage === 'contract')
                                     <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
                                         <button class="dk-close-btn dk-close-won" style="flex: 1;"
-                                                wire:click="updateDealStage({{ $deal->id }}, 'closed_won')">
+                                                draggable="false"
+                                                onclick="event.stopPropagation(); event.preventDefault(); $wire.updateDealStage({{ $deal->id }}, 'closed_won')">
                                             <x-heroicon-o-check-circle style="width: 14px; height: 14px;" />
                                             Won
                                         </button>
                                         <button class="dk-close-btn dk-close-lost" style="flex: 1;"
-                                                wire:click="updateDealStage({{ $deal->id }}, 'closed_lost')">
+                                                draggable="false"
+                                                onclick="event.stopPropagation(); event.preventDefault(); $wire.updateDealStage({{ $deal->id }}, 'closed_lost')">
                                             <x-heroicon-o-x-circle style="width: 14px; height: 14px;" />
                                             Lost
                                         </button>
                                     </div>
+                                @endif
+
+                                {{-- Create Client button — visible on all active deals --}}
+                                @if(!$deal->client_id)
+                                    <button class="dk-close-btn" style="background: #eef2ff; color: #4f46e5; margin-top: 0.5rem;"
+                                            draggable="false"
+                                            onclick="event.stopPropagation(); event.preventDefault(); $wire.convertDealToClient({{ $deal->id }})">
+                                        <x-heroicon-o-building-office-2 style="width: 14px; height: 14px;" />
+                                        → Create Client
+                                    </button>
                                 @endif
                             </div>
                         @endforeach

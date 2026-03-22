@@ -219,6 +219,15 @@ class SystemSetting extends Model
             ['group' => 'integrations', 'key' => 'ga_enabled', 'label' => 'Enable Google Analytics', 'value' => '0', 'type' => 'toggle', 'sort_order' => 1],
             ['group' => 'integrations', 'key' => 'ga_measurement_id', 'label' => 'Measurement ID', 'value' => null, 'type' => 'text', 'sort_order' => 2],
             ['group' => 'integrations', 'key' => 'ga_track_events', 'label' => 'Track Custom Events', 'value' => '1', 'type' => 'toggle', 'sort_order' => 3],
+
+            // ── AI Chatbot ──
+            ['group' => 'integrations', 'key' => 'chatbot_enabled', 'label' => 'Enable Chatbot', 'value' => '1', 'type' => 'toggle', 'sort_order' => 10],
+            ['group' => 'integrations', 'key' => 'chatbot_ai_enabled', 'label' => 'Enable AI Responses', 'value' => '1', 'type' => 'toggle', 'sort_order' => 11],
+            ['group' => 'integrations', 'key' => 'chatbot_ai_provider', 'label' => 'AI Provider', 'value' => 'gemini', 'type' => 'select', 'sort_order' => 12],
+            ['group' => 'integrations', 'key' => 'chatbot_ai_model', 'label' => 'AI Model', 'value' => 'gemini-2.0-flash', 'type' => 'select', 'sort_order' => 13],
+            ['group' => 'integrations', 'key' => 'chatbot_api_key', 'label' => 'AI API Key', 'value' => null, 'type' => 'password', 'is_encrypted' => true, 'sort_order' => 14],
+            ['group' => 'integrations', 'key' => 'chatbot_welcome_message', 'label' => 'Welcome Message', 'value' => null, 'type' => 'text', 'sort_order' => 15],
+            ['group' => 'integrations', 'key' => 'chatbot_bot_name', 'label' => 'Bot Name', 'value' => 'TrustedU Assistant', 'type' => 'text', 'sort_order' => 16],
         ];
 
         foreach ($defaults as $setting) {

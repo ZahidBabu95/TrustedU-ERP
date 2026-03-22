@@ -409,6 +409,66 @@ class SystemSettings extends Page
                                             ->prefix('ID')
                                             ->maxLength(20),
                                     ]),
+
+                                Section::make('AI Chatbot Configuration')
+                                    ->description('Configure AI provider for the chatbot assistant. Get a free API key from Google AI Studio (aistudio.google.com/apikey). Knowledge Base entries can be managed from Platform → Chatbot Engine menu.')
+                                    ->icon('heroicon-o-cpu-chip')
+                                    ->schema([
+                                        Grid::make(['md' => 2])->schema([
+                                            Toggle::make('chatbot_enabled')
+                                                ->label('Enable Chatbot')
+                                                ->helperText('Show/hide chatbot on the public website')
+                                                ->live(),
+                                            Toggle::make('chatbot_ai_enabled')
+                                                ->label('Enable AI Responses')
+                                                ->helperText('Use AI for responses. If off, uses knowledge base only.')
+                                                ->visible(fn ($get) => $get('chatbot_enabled')),
+                                        ]),
+                                        Grid::make(['md' => 2])->schema([
+                                            Select::make('chatbot_ai_provider')
+                                                ->label('AI Provider')
+                                                ->options([
+                                                    'gemini' => 'Google Gemini (Free)',
+                                                    'openai' => 'OpenAI (ChatGPT)',
+                                                    'claude' => 'Anthropic Claude',
+                                                ])
+                                                ->placeholder('Select AI provider')
+                                                ->helperText('Gemini offers 15 req/min free')
+                                                ->visible(fn ($get) => $get('chatbot_ai_enabled')),
+                                            Select::make('chatbot_ai_model')
+                                                ->label('AI Model')
+                                                ->options([
+                                                    'gemini-2.0-flash' => 'Gemini 2.0 Flash (Fastest)',
+                                                    'gemini-2.0-flash-lite' => 'Gemini 2.0 Flash Lite',
+                                                    'gemini-1.5-flash' => 'Gemini 1.5 Flash',
+                                                    'gemini-1.5-pro'   => 'Gemini 1.5 Pro',
+                                                    'gpt-4o-mini'      => 'GPT-4o Mini',
+                                                    'gpt-4o'           => 'GPT-4o',
+                                                    'claude-3-haiku'   => 'Claude 3 Haiku',
+                                                ])
+                                                ->placeholder('Select model')
+                                                ->visible(fn ($get) => $get('chatbot_ai_enabled')),
+                                        ]),
+                                        TextInput::make('chatbot_api_key')
+                                            ->label('API Key')
+                                            ->password()
+                                            ->revealable()
+                                            ->placeholder('Enter your AI provider API key')
+                                            ->helperText('This key is encrypted and stored securely')
+                                            ->visible(fn ($get) => $get('chatbot_ai_enabled')),
+                                        Grid::make(['md' => 2])->schema([
+                                            TextInput::make('chatbot_welcome_message')
+                                                ->label('Welcome Message')
+                                                ->placeholder('আসসালামু আলাইকুম! কীভাবে সাহায্য করতে পারি?')
+                                                ->helperText('First message visitors see when opening chat')
+                                                ->visible(fn ($get) => $get('chatbot_enabled')),
+                                            TextInput::make('chatbot_bot_name')
+                                                ->label('Bot Name')
+                                                ->placeholder('TrustedU Assistant')
+                                                ->helperText('Name displayed in the chat header')
+                                                ->visible(fn ($get) => $get('chatbot_enabled')),
+                                        ]),
+                                    ]),
                             ]),
                     ])
                     ->columnSpanFull()

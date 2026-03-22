@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Leads\Pages;
 use App\Filament\Resources\Leads\LeadResource;
 use App\Models\Lead;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -47,6 +48,33 @@ class ListLeads extends ListRecords
     {
         $lead = Lead::findOrFail($leadId);
         $lead->update(['status' => $newStatus]);
+
+        $this->dispatch('$refresh');
+    }
+
+    /**
+     * Convert a lead to a deal directly from Kanban.
+     */
+    public function convertLeadToDeal(int $leadId): void
+    {
+        $lead = Lead::findOrFail($leadId);
+
+        if ($lead->isConverted()) {
+            Notification::make()
+                ->title('Already Converted')
+                ->body('This lead has already been converted to a deal.')
+                ->warning()
+                ->send();
+            return;
+        }
+
+        $deal = $lead->convertToDeal();
+
+        Notification::make()
+            ->title('🎉 Deal Created!')
+            ->body("Deal \"{$deal->title}\" has been created from lead \"{$lead->name}\".")
+            ->success()
+            ->send();
 
         $this->dispatch('$refresh');
     }

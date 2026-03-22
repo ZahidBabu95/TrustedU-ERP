@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Deals\Pages;
 use App\Filament\Resources\Deals\DealResource;
 use App\Models\Deal;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 
 class ListDeals extends ListRecords
@@ -60,6 +61,33 @@ class ListDeals extends ListRecords
         }
 
         $deal->update($updates);
+        $this->dispatch('$refresh');
+    }
+
+    /**
+     * Convert a deal to a client directly from Kanban.
+     */
+    public function convertDealToClient(int $dealId): void
+    {
+        $deal = Deal::findOrFail($dealId);
+
+        if ($deal->isConverted()) {
+            Notification::make()
+                ->title('Already Converted')
+                ->body('This deal has already been converted to a client.')
+                ->warning()
+                ->send();
+            return;
+        }
+
+        $client = $deal->convertToClient($deal->team_id);
+
+        Notification::make()
+            ->title('🎉 Client Created!')
+            ->body("Client \"{$client->name}\" has been created from deal \"{$deal->title}\".")
+            ->success()
+            ->send();
+
         $this->dispatch('$refresh');
     }
 

@@ -97,6 +97,53 @@ class Deal extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    // ── Conversion ──
+
+    /**
+     * Convert this deal into a Client (when closed_won).
+     */
+    public function convertToClient(?int $teamId = null): Client
+    {
+        $client = Client::create([
+            'name'              => $this->company ?: $this->contact_name ?: $this->title,
+            'email'             => $this->contact_email,
+            'phone'             => $this->contact_phone,
+            'institution_type'  => $this->lead?->demoRequest?->institution_type ?? null,
+            'district'          => $this->lead?->demoRequest?->district ?? null,
+            'principal_name'    => $this->contact_name,
+            'principal_phone'   => $this->contact_phone,
+            'contract_start'    => now(),
+            'is_active'         => true,
+            'is_live'           => false,
+            'is_featured'       => false,
+        ]);
+
+        // Attach team if available
+        if ($teamId || $this->team_id) {
+            $client->teams()->attach($teamId ?: $this->team_id);
+        }
+
+        // Link deal to client
+        $this->update([
+            'client_id' => $client->id,
+            'stage'     => 'closed_won',
+            'closed_at' => now(),
+            'probability' => 100,
+        ]);
+
+        // Also link the lead to this client if exists
+        if ($this->lead_id) {
+            Lead::where('id', $this->lead_id)->update(['client_id' => $client->id]);
+        }
+
+        return $client;
+    }
+
     // ── Helpers ──
     public function getStageProgressAttribute(): int
     {
@@ -106,5 +153,10 @@ class Deal extends Model
             return $this->stage === 'closed_won' ? 100 : 0;
         }
         return (int) round(($index + 1) / count($stages) * 100);
+    }
+
+    public function isConverted(): bool
+    {
+        return $this->stage === 'closed_won' && $this->client_id !== null;
     }
 }

@@ -86,4 +86,51 @@ class Lead extends Model
     {
         return $this->hasMany(Deal::class);
     }
+
+    public function demoRequest()
+    {
+        return $this->belongsTo(DemoRequest::class);
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    // ── Conversion ──
+
+    /**
+     * Convert this lead into a CRM Deal.
+     */
+    public function convertToDeal(?int $assignedTo = null): Deal
+    {
+        $deal = Deal::create([
+            'title'              => ($this->company ?: $this->name) . ' — Deal',
+            'company'            => $this->company,
+            'contact_name'       => $this->name,
+            'contact_email'      => $this->email,
+            'contact_phone'      => $this->phone,
+            'value'              => $this->value,
+            'stage'              => 'discovery',
+            'priority'           => $this->priority ?? 'medium',
+            'deal_source'        => 'lead',
+            'probability'        => 10,
+            'lead_id'            => $this->id,
+            'assigned_to'        => $assignedTo ?? $this->assigned_to,
+            'team_id'            => $this->team_id,
+            'expected_close_date' => $this->expected_close_date,
+            'notes'              => "Converted from Lead #{$this->id}: {$this->name}\n" . ($this->notes ?? ''),
+        ]);
+
+        $this->update(['status' => 'won']);
+
+        return $deal;
+    }
+
+    // ── Helpers ──
+
+    public function isConverted(): bool
+    {
+        return $this->status === 'won' && $this->deals()->exists();
+    }
 }

@@ -6,6 +6,7 @@
     <title>@yield('title', 'TrustedU ERP - Bangladesh Army Authorized Education Platform')</title>
     <meta name="description" content="TrustedU ERP is an authorized education management system by Bangladesh Army, unifying 63 Cantonment Public Schools & Colleges under a centralized digital platform.">
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -526,5 +527,8 @@
     });
     </script>
     @endif
+
+    {{-- ═══════════════════ Chatbot Widget ═══════════════════ --}}
+    @include('components.chatbot-widget')
 </body>
 </html>

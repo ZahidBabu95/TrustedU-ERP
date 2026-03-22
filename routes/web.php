@@ -4,6 +4,7 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DemoRequestController;
+use App\Http\Controllers\ChatBotController;
 use Illuminate\Support\Facades\Route;
 
 // ── Public Landing ─────────────────────────────────────────────
@@ -130,4 +131,11 @@ Route::middleware('auth')->get('/admin/api/dashboard-search', function (\Illumin
     }
 
     return response()->json($results);
+});
+
+// ── Chatbot API ────────────────────────────────────────────────
+Route::prefix('chatbot')->group(function () {
+    Route::post('/start', [ChatBotController::class, 'startConversation']);
+    Route::post('/message', [ChatBotController::class, 'sendMessage']);
+    Route::post('/visitor-info', [ChatBotController::class, 'updateVisitorInfo']);
 });
