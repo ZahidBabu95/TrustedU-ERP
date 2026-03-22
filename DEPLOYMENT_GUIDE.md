@@ -1,8 +1,8 @@
 # 🚀 TrustedU ERP — Deployment & Update Guide
 
-> **Last Updated:** March 20, 2026  
+> **Last Updated:** March 22, 2026  
 > **Author:** TrustedU ERP Team  
-> **Version:** 2.1
+> **Version:** 2.2
 
 ---
 
@@ -19,6 +19,7 @@
 9. [First Time Setup](#-first-time-setup-নতুন-সার্ভারে)
 10. [Troubleshooting](#-troubleshooting)
 11. [Common Mistakes to Avoid](#-common-mistakes-to-avoid)
+12. [Version History](#-version-history)
 
 ---
 
@@ -342,6 +343,46 @@ php artisan migrate --force   # চালান
 - [ ] Assets পরিবর্তন থাকলে `rsync` দিয়ে কপি করেছি (index.php বাদে!)
 - [ ] সাইট ব্রাউজারে চেক করেছি
 - [ ] `.env`-তে `APP_DEBUG=false` আছে
+
+---
+
+## 📦 Version History
+
+### v2.2 — March 22, 2026 (AI Chatbot & Knowledge Base)
+
+**নতুন ফিচারসমূহ:**
+- 🤖 **AI Chatbot** — Gemini AI powered চ্যাটবট (ওয়েবসাইটে floating widget)
+- 📚 **Chatbot Knowledge Base Engine** — Platform → Chatbot Engine মেনুতে Q&A ম্যানেজমেন্ট
+- 🔑 **AI API Settings** — System Settings → Integrations → AI Chatbot Configuration
+- 📊 **CRM Flow Upgrades** — Lead → Deal → Client পাইপলাইন উন্নতি
+- 🔍 **Google Analytics Fix** — GA tracking এখন সঠিকভাবে কাজ করছে
+
+**নতুন Migrations (৩টি):**
+- `2026_03_20_101359_add_crm_flow_fields.php`
+- `2026_03_22_032054_create_chat_conversations_and_messages_tables.php`
+- `2026_03_22_035324_create_chatbot_knowledge_bases_table.php`
+
+**ডেপ্লয় পদ্ধতি:** Full Update (Migration আছে)
+```bash
+cd ~/erp_core
+git pull origin main
+php ~/composer.phar install --no-dev --optimize-autoloader --ignore-platform-req=php
+php artisan migrate --force
+php artisan optimize:clear
+```
+
+**ডেপ্লয়ের পর করণীয়:**
+1. `/admin/system-settings` → Integrations → AI Chatbot Configuration → Gemini API Key সেট করুন
+2. `/admin/chatbot-knowledge` → "Load Defaults" বাটনে ক্লিক করে ডিফল্ট Q&A লোড করুন
+3. চ্যাটবট টেস্ট করুন — ওয়েবসাইটে floating বাটনে ক্লিক করে দেখুন
+
+---
+
+### v2.1 — March 20, 2026
+- Dashboard ও Website Dashboard আলাদা করা হয়েছে
+- Login As User ফিচার (Super Admin only)
+- SMS Module enhancements
+- Cloudflare R2 Storage integration
 
 ---
 
