@@ -205,6 +205,148 @@
     </div>
 </div>
 
+{{-- ══ CRM HUB ══ --}}
+<div class="dash-grid-2" style="margin-bottom:1.25rem;">
+    {{-- Finance Overview --}}
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <div>
+                <h2 class="dash-card-title">💰 Finance Overview</h2>
+                <p class="dash-card-desc">Billing, Invoices & Payments</p>
+            </div>
+            <a href="{{ route('filament.admin.resources.crm-invoices.index') }}" class="dash-link-btn">View Invoices →</a>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;padding:0.8rem;">
+            <div class="support-stat green">
+                <span class="support-stat-num">৳{{ number_format($totalRevenue) }}</span>
+                <span class="support-stat-label">Total Revenue</span>
+            </div>
+            <div class="support-stat blue">
+                <span class="support-stat-num">৳{{ number_format($monthlyRevenue) }}</span>
+                <span class="support-stat-label">This Month</span>
+            </div>
+            <div class="support-stat {{ $overdueInvoices > 0 ? 'amber' : 'slate' }}">
+                <span class="support-stat-num">{{ $overdueInvoices }}</span>
+                <span class="support-stat-label">Overdue Invoices</span>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;padding:0 0.8rem 0.8rem;">
+            <div class="support-stat slate">
+                <span class="support-stat-num">{{ $activePlans }}</span>
+                <span class="support-stat-label">Active Plans</span>
+            </div>
+            <div class="support-stat {{ $unpaidInvoices > 0 ? 'amber' : 'green' }}">
+                <span class="support-stat-num">{{ $unpaidInvoices }}</span>
+                <span class="support-stat-label">Unpaid Invoices</span>
+            </div>
+            <div class="support-stat {{ $dueSoonPlans > 0 ? 'amber' : 'slate' }}">
+                <span class="support-stat-num">{{ $dueSoonPlans }}</span>
+                <span class="support-stat-label">Due Soon Plans</span>
+            </div>
+        </div>
+        @if($unpaidAmount > 0)
+        <div style="padding:0 0.8rem 0.8rem;">
+            <div class="attn-item orange" style="margin:0;">
+                <span class="attn-icon">⚠️</span>
+                <div class="attn-info"><strong>৳{{ number_format($unpaidAmount, 2) }} Outstanding</strong><span>Total unpaid invoice amount</span></div>
+            </div>
+        </div>
+        @endif
+    </div>
+
+    {{-- CRM Operations --}}
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <div>
+                <h2 class="dash-card-title">⚙️ CRM Operations</h2>
+                <p class="dash-card-desc">Proposals, Migrations, Training & Follow-ups</p>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;padding:0.8rem;">
+            <a href="{{ route('filament.admin.resources.crm-proposals.index') }}" class="crm-op-card" style="--op-c:#8b5cf6;">
+                <div class="crm-op-icon" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">📝</div>
+                <div class="crm-op-body">
+                    <span class="crm-op-num">{{ $draftProposals + $sentProposals }}</span>
+                    <span class="crm-op-label">Proposals</span>
+                </div>
+                <div class="crm-op-tags">
+                    @if($draftProposals > 0)<span class="kpi-tag purple">{{ $draftProposals }} draft</span>@endif
+                    @if($sentProposals > 0)<span class="kpi-tag blue">{{ $sentProposals }} sent</span>@endif
+                </div>
+            </a>
+            <a href="{{ route('filament.admin.resources.crm-migrations.index') }}" class="crm-op-card" style="--op-c:#14b8a6;">
+                <div class="crm-op-icon" style="background:linear-gradient(135deg,#14b8a6,#5eead4);">🔄</div>
+                <div class="crm-op-body">
+                    <span class="crm-op-num">{{ $activeMigrations }}</span>
+                    <span class="crm-op-label">Migrations</span>
+                </div>
+                @if($activeMigrations > 0)<div class="crm-op-tags"><span class="kpi-tag green">Active</span></div>@endif
+            </a>
+            <a href="{{ route('filament.admin.resources.crm-trainings.index') }}" class="crm-op-card" style="--op-c:#f59e0b;">
+                <div class="crm-op-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);">🎓</div>
+                <div class="crm-op-body">
+                    <span class="crm-op-num">{{ $activeTrainings }}</span>
+                    <span class="crm-op-label">Training</span>
+                </div>
+                @if($activeTrainings > 0)<div class="crm-op-tags"><span class="kpi-tag orange">Active</span></div>@endif
+            </a>
+            <a href="{{ route('filament.admin.resources.crm-follow-ups.index') }}" class="crm-op-card" style="--op-c:{{ $overdueFollowUps > 0 ? '#ef4444' : '#3b82f6' }};">
+                <div class="crm-op-icon" style="background:linear-gradient(135deg,{{ $overdueFollowUps > 0 ? '#ef4444,#f87171' : '#3b82f6,#60a5fa' }});">📅</div>
+                <div class="crm-op-body">
+                    <span class="crm-op-num">{{ $todayFollowUps }}</span>
+                    <span class="crm-op-label">Follow-ups Today</span>
+                </div>
+                @if($overdueFollowUps > 0)<div class="crm-op-tags"><span class="kpi-tag" style="color:#ef4444;background:#fef2f2;">⚠️ {{ $overdueFollowUps }} overdue</span></div>@endif
+            </a>
+        </div>
+    </div>
+</div>
+
+{{-- ══ RECENT INVOICES & PAYMENTS ══ --}}
+<div class="dash-grid-2" style="margin-bottom:1.25rem;">
+    <div class="dash-card flex-1">
+        <div class="dash-card-header">
+            <h2 class="dash-card-title">📄 Recent Invoices</h2>
+            <a href="{{ route('filament.admin.resources.crm-invoices.index') }}" class="dash-link-sm">View all →</a>
+        </div>
+        <div class="dash-list">
+            @forelse($recentInvoices as $inv)
+            @php $isc = \App\Models\CrmInvoice::STATUS_COLORS[$inv->status] ?? '#94a3b8'; @endphp
+            <div class="dash-list-item">
+                <div class="dash-avatar" style="background:{{ $isc }}22;color:{{ $isc }};font-weight:800;font-size:0.5rem;">{{ $inv->invoice_number ? substr($inv->invoice_number, -4) : '—' }}</div>
+                <div class="dash-list-info">
+                    <span class="dash-list-title">{{ $inv->client?->name ?? 'Unknown' }}</span>
+                    <span class="dash-list-meta">{{ $inv->invoice_number }} • ৳{{ number_format($inv->total, 2) }}</span>
+                </div>
+                <span class="dash-badge" style="--badge-c:{{ $isc }};">{{ strtoupper(str_replace('_',' ',$inv->status)) }}</span>
+            </div>
+            @empty
+            <div class="dash-empty">No invoices yet</div>
+            @endforelse
+        </div>
+    </div>
+    <div class="dash-card flex-1">
+        <div class="dash-card-header">
+            <h2 class="dash-card-title">💰 Recent Payments</h2>
+            <a href="{{ route('filament.admin.resources.crm-payments.index') }}" class="dash-link-sm">View all →</a>
+        </div>
+        <div class="dash-list">
+            @forelse($recentPayments as $pay)
+            <div class="dash-list-item">
+                <div class="dash-avatar" style="background:#ecfdf5;color:#059669;font-weight:800;">৳</div>
+                <div class="dash-list-info">
+                    <span class="dash-list-title">৳{{ number_format($pay->amount, 2) }}</span>
+                    <span class="dash-list-meta">{{ $pay->client?->name ?? '—' }} • {{ $pay->invoice?->invoice_number ?? '—' }}</span>
+                </div>
+                <span class="dash-badge" style="--badge-c:#059669;">{{ strtoupper(str_replace('_',' ',$pay->payment_method)) }}</span>
+            </div>
+            @empty
+            <div class="dash-empty">No payments yet</div>
+            @endforelse
+        </div>
+    </div>
+</div>
+
 {{-- ══ MAIN 3-COL ══ --}}
 <div class="dash-grid-3">
     {{-- COL 1: Support --}}
@@ -578,6 +720,17 @@
 .attn-info strong { font-size:0.76rem; display:block; }
 .attn-info span { font-size:0.6rem; opacity:0.7; }
 .attn-arrow { font-size:0.75rem; opacity:0.5; }
+
+/* ── CRM Ops Cards ── */
+.crm-op-card { display:flex; align-items:center; gap:0.55rem; padding:0.7rem 0.85rem; border-radius:12px; text-decoration:none; border:1.5px solid #f1f3f5; transition:all .25s cubic-bezier(.4,0,.2,1); background:#fafafa; position:relative; overflow:hidden; flex-wrap:wrap; }
+.crm-op-card:hover { transform:translateY(-2px); border-color:color-mix(in srgb, var(--op-c) 30%, transparent); box-shadow:0 8px 24px color-mix(in srgb, var(--op-c) 10%, transparent); background:#fff; }
+.crm-op-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--op-c); opacity:0; transition:opacity .25s; }
+.crm-op-card:hover::before { opacity:1; }
+.crm-op-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; box-shadow:0 3px 8px rgba(0,0,0,0.1); }
+.crm-op-body { flex:1; min-width:0; }
+.crm-op-num { display:block; font-size:1.2rem; font-weight:800; color:#0f172a; letter-spacing:-0.02em; line-height:1.2; }
+.crm-op-label { display:block; font-size:0.6rem; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.04em; }
+.crm-op-tags { display:flex; gap:0.25rem; width:100%; margin-top:0.2rem; padding-left:2.9rem; }
 
 /* ── Responsive ── */
 @media (max-width:1400px) { .kpi-row { grid-template-columns:repeat(3,1fr); } }

@@ -420,13 +420,16 @@ body,
    ═══════════════════════════════════════════════════════════ */
 .fi-main { background: var(--bg-canvas) !important; }
 
-.fi-main-ctn, .fi-main, .fi-page .fi-page-content, .fi-page > div,
-.fi-section-content-ctn, .fi-header-ctn, main > div,
-.fi-page-content > div, .container, .mx-auto,
+.fi-main-ctn, .fi-main, .fi-page .fi-page-content,
+.fi-section-content-ctn, .fi-header-ctn,
 .fi-main.fi-width-full, .fi-main.fi-width-7xl,
 .fi-main[class*="fi-width"], div.fi-main {
     max-width: 100% !important;
     width: 100% !important;
+}
+.fi-main-ctn { padding: 0 16px !important; }
+@media (min-width: 1024px) {
+    .fi-main-ctn { padding: 0 32px !important; }
 }
 .fi-page { padding: 1.25rem 1.75rem !important; }
 
@@ -650,4 +653,39 @@ body,
     .fi-ta-table thead th { font-size: 0.58rem !important; padding: 0.5rem 0.6rem !important; }
     .fi-ta-table tbody td { font-size: 0.72rem !important; padding: 0.5rem 0.6rem !important; }
     .fi-topbar { height: 48px !important; }
+    .fi-page { padding: 0.75rem 1rem !important; }
+}
+
+/* ─── Compact Table Rows ─────────────────────────────────── */
+.fi-ta-table thead th {
+    padding-top: 0.45rem !important;
+    padding-bottom: 0.45rem !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.fi-ta-table tbody td {
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+    font-size: 0.8rem !important;
+}
+.fi-ta-table tbody tr {
+    border-bottom: 1px solid var(--border-light) !important;
+}
+.fi-ta-row-description {
+    font-size: 0.68rem !important;
+    margin-top: 0 !important;
+    line-height: 1.2 !important;
+}
+
+/* ─── Fix: Dropdown clipping in form sections ────────────── */
+.fi-section-content-ctn,
+.fi-section,
+.fi-tab,
+.fi-tabs-tab,
+.fi-fo-field-wrp,
+.fi-fo-component-ctn,
+fieldset,
+.fi-form-component-container {
+    overflow: visible !important;
 }

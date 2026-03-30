@@ -4,6 +4,13 @@ namespace App\Filament\Pages;
 
 use App\Models\Client;
 use App\Models\ContactMessage;
+use App\Models\CrmBillingPlan;
+use App\Models\CrmFollowUp;
+use App\Models\CrmInvoice;
+use App\Models\CrmMigration;
+use App\Models\CrmPayment;
+use App\Models\CrmProposal;
+use App\Models\CrmTraining;
 use App\Models\Deal;
 use App\Models\DemoRequest;
 use App\Models\Lead;
@@ -135,6 +142,27 @@ class Dashboard extends BaseDashboard
             ->pluck('cnt', 'status')
             ->toArray();
 
+        // ── CRM Billing / Finance ──
+        $totalRevenue      = CrmPayment::sum('amount');
+        $monthlyRevenue    = CrmPayment::thisMonth()->sum('amount');
+        $overdueInvoices   = CrmInvoice::overdue()->count();
+        $unpaidInvoices    = CrmInvoice::unpaid()->count();
+        $unpaidAmount      = CrmInvoice::unpaid()->get()->sum(fn($inv) => $inv->due_amount);
+        $activePlans       = CrmBillingPlan::active()->count();
+        $dueSoonPlans      = CrmBillingPlan::dueSoon(7)->count();
+
+        // ── CRM Operations ──
+        $activeMigrations  = CrmMigration::active()->count();
+        $activeTrainings   = CrmTraining::active()->count();
+        $draftProposals    = CrmProposal::where('status', 'draft')->count();
+        $sentProposals     = CrmProposal::where('status', 'sent')->count();
+        $overdueFollowUps  = CrmFollowUp::overdue()->count();
+        $todayFollowUps    = CrmFollowUp::today()->pending()->count();
+
+        // Recent CRM data
+        $recentInvoices = CrmInvoice::with('client')->latest()->limit(5)->get();
+        $recentPayments = CrmPayment::with(['client', 'invoice'])->latest()->limit(5)->get();
+
         // ── Current Team Info ──
         $currentTeam = $user?->currentTeam;
 
@@ -150,7 +178,11 @@ class Dashboard extends BaseDashboard
             'convRate', 'pendingDemos', 'unreadMessages',
             'expiringDomains', 'expiringHosting',
             'recentLeads', 'recentTickets', 'recentDeals', 'upcomingTasks',
-            'leadSources', 'leadStatuses', 'currentTeam'
+            'leadSources', 'leadStatuses', 'currentTeam',
+            'totalRevenue', 'monthlyRevenue', 'overdueInvoices', 'unpaidInvoices',
+            'unpaidAmount', 'activePlans', 'dueSoonPlans',
+            'activeMigrations', 'activeTrainings', 'draftProposals', 'sentProposals',
+            'overdueFollowUps', 'todayFollowUps', 'recentInvoices', 'recentPayments'
         );
     }
 

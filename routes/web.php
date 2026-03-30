@@ -133,6 +133,46 @@ Route::middleware('auth')->get('/admin/api/dashboard-search', function (\Illumin
     return response()->json($results);
 });
 
+// ── Lead Contact Report (Printable A4) ────────────────────────
+Route::middleware('auth')->get('/admin/leads/{lead}/report', function (\App\Models\Lead $lead) {
+    $lead->load('team', 'assignee');
+    $report = $lead->contact_report ?? [];
+    $erpModules = \App\Models\ErpModule::active()->ordered()->pluck('name', 'slug')->toArray();
+    return view('reports.lead-contact-report', compact('lead', 'report', 'erpModules'));
+})->name('lead.contact-report');
+
+// ── Lead Proposal Report (Printable A4) ───────────────────────
+Route::middleware('auth')->get('/admin/leads/{lead}/proposal', function (\App\Models\Lead $lead) {
+    $lead->load('team', 'assignee');
+    $erpModules = \App\Models\ErpModule::active()->ordered()->pluck('name', 'slug')->toArray();
+    return view('reports.lead-proposal-report', compact('lead', 'erpModules'));
+})->name('lead.proposal-report');
+
+// ── CRM Invoice Print ─────────────────────────────────────────
+Route::middleware('auth')->get('/admin/crm-invoices/{invoice}/print', function (\App\Models\CrmInvoice $invoice) {
+    $invoice->load('client', 'creator');
+    $invoice->calculateTotals();
+    return view('reports.crm-invoice-print', compact('invoice'));
+})->name('crm.invoice.print');
+
+// ── CRM Deed / Agreement Print ────────────────────────────────
+Route::middleware('auth')->get('/admin/deals/{deal}/deed-print', function (\App\Models\Deal $deal) {
+    $deal->load('client', 'lead');
+    $client = $deal->client;
+    $company = $deal->deed_company_info ?? [
+        'name'         => 'Amar School Management Software Company',
+        'tagline'      => 'Manage School Easily',
+        'phone'        => '+88 01793661417',
+        'email'        => 'hello.amarschool@gmail.com',
+        'website'      => 'www.amarschool.co',
+        'address'      => 'House #192, Road #2, Avenue #3, Mirpur DOHS, Dhaka 1216, Bangladesh',
+        'ceo_name'     => 'Md. Aminul Islam',
+        'ceo_title'    => 'CEO',
+        'product_name' => 'Amar School',
+    ];
+    return view('reports.crm-deed-print', compact('deal', 'client', 'company'));
+})->name('crm.deed.print');
+
 // ── Chatbot API ────────────────────────────────────────────────
 Route::prefix('chatbot')->group(function () {
     Route::post('/start', [ChatBotController::class, 'startConversation']);

@@ -65,13 +65,6 @@ class AdminPanelProvider extends PanelProvider
                 \Illuminate\Support\Facades\Blade::render('<livewire:topbar-actions />')
             )
             ->navigationItems([
-                // ── CRM: Deals placeholder ──
-                NavigationItem::make('Deals')
-                    ->url('#')
-                    ->icon('heroicon-o-currency-dollar')
-                    ->group('CRM')
-                    ->sort(2),
-
                 // ── Website CMS: extra items ──
 
                 NavigationItem::make('Visit Website')

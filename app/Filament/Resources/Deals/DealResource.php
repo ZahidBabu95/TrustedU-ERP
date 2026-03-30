@@ -19,9 +19,15 @@ class DealResource extends Resource
 {
     protected static ?string $model = Deal::class;
 
-    public static function getNavigationIcon(): string|BackedEnum|null { return 'heroicon-o-currency-dollar'; }
+    // ── Override ALL labels to "Deed" ──
+    protected static ?string $label = 'Deed';
+    protected static ?string $pluralLabel = 'Deed / Agreement';
+    protected static ?string $navigationLabel = 'Deed / Agreement';
+    protected static ?string $slug = 'deals'; // keep URL same
+
+    public static function getNavigationIcon(): string|BackedEnum|null { return 'heroicon-o-document-check'; }
     public static function getNavigationGroup(): ?string { return 'CRM'; }
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $recordTitleAttribute = 'title';
 

@@ -67,6 +67,18 @@ class TeamGroupResource extends Resource
                         Textarea::make('description')
                             ->rows(2)
                             ->placeholder('Brief description of this team'),
+                        Grid::make(['md' => 2])->schema([
+                            TextInput::make('company_name')
+                                ->maxLength(255)
+                                ->placeholder('e.g. Trust Innovation Ltd.')
+                                ->label('Company Name (for Reports)')
+                                ->helperText('Displayed on lead contact reports'),
+                            TextInput::make('slogan')
+                                ->maxLength(255)
+                                ->placeholder('e.g. Enterprise Resource Planning Solutions')
+                                ->label('Company Slogan / Tagline')
+                                ->helperText('Displayed below company name on reports'),
+                        ]),
                         Grid::make(['md' => 3])->schema([
                             FileUpload::make('logo')
                                 ->image()

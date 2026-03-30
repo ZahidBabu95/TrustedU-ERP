@@ -2,21 +2,17 @@
 
 namespace App\Filament\Resources\Deals\Tables;
 
+use App\Models\CrmActivity;
 use App\Models\Deal;
-use App\Models\Team;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class DealsTable
@@ -25,60 +21,58 @@ class DealsTable
     {
         return $table
             ->columns([
-                TextColumn::make('title')
+                TextColumn::make('deed_number')
+                    ->label('Deed #')
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
+                    ->placeholder('Not Generated')
+                    ->icon('heroicon-o-document-check')
+                    ->copyable(),
+                TextColumn::make('title')
+                    ->label('Agreement Title')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(40)
                     ->description(fn ($record) => $record->company),
-                TextColumn::make('stage')
+                TextColumn::make('deed_status')
+                    ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'discovery'    => 'gray',
-                        'prospecting'  => 'info',
-                        'proposal'     => 'warning',
-                        'negotiation'  => 'primary',
-                        'contract'     => 'primary',
-                        'closed_won'   => 'success',
-                        'closed_lost'  => 'danger',
-                        default        => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state) => Deal::STAGE_LABELS[$state] ?? $state)
-                    ->icon(fn (string $state): string => match ($state) {
-                        'discovery'    => 'heroicon-o-magnifying-glass',
-                        'prospecting'  => 'heroicon-o-eye',
-                        'proposal'     => 'heroicon-o-document-text',
-                        'negotiation'  => 'heroicon-o-scale',
-                        'contract'     => 'heroicon-o-clipboard-document-check',
-                        'closed_won'   => 'heroicon-o-trophy',
-                        'closed_lost'  => 'heroicon-o-x-circle',
-                        default        => 'heroicon-o-question-mark-circle',
+                    ->formatStateUsing(fn (?string $state) => Deal::DEED_STATUS_LABELS[$state] ?? 'Not Created')
+                    ->color(fn (?string $state): string => match ($state) {
+                        'not_created' => 'gray',
+                        'draft'       => 'warning',
+                        'generated'   => 'info',
+                        'signed'      => 'success',
+                        'active'      => 'success',
+                        'expired'     => 'danger',
+                        default       => 'gray',
                     }),
-                TextColumn::make('value')
+                TextColumn::make('deed_plan_name')
+                    ->label('Plan')
+                    ->placeholder('—')
+                    ->icon('heroicon-o-rectangle-stack'),
+                TextColumn::make('deed_monthly_fee')
+                    ->label('Monthly Fee')
                     ->money('BDT')
                     ->sortable(),
-                TextColumn::make('priority')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'low'    => 'success',
-                        'medium' => 'warning',
-                        'high'   => 'danger',
-                        'urgent' => 'danger',
-                        default  => 'gray',
-                    }),
-                TextColumn::make('probability')
-                    ->suffix('%')
+                TextColumn::make('deed_total_users')
+                    ->label('Users')
+                    ->placeholder('—')
+                    ->sortable(),
+                TextColumn::make('deed_effective_date')
+                    ->label('Start Date')
+                    ->date('d M Y')
                     ->sortable()
-                    ->color(fn ($state) => match (true) {
-                        $state >= 90 => 'success',
-                        $state >= 50 => 'warning',
-                        default      => 'gray',
-                    }),
-                TextColumn::make('assignee.name')
-                    ->label('Assigned To')
+                    ->placeholder('—'),
+                TextColumn::make('deed_end_date')
+                    ->label('End Date')
+                    ->date('d M Y')
                     ->sortable()
-                    ->placeholder('Unassigned'),
-                TextColumn::make('lead.name')
-                    ->label('From Lead')
+                    ->placeholder('—'),
+                TextColumn::make('deed_duration')
+                    ->label('Duration')
+                    ->suffix(' Year(s)')
                     ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('client.name')
@@ -89,11 +83,17 @@ class DealsTable
                         ? route('filament.admin.resources.clients.edit', $record->client_id)
                         : null
                     )
-                    ->color('primary')
-                    ->toggleable(),
-                TextColumn::make('expected_close_date')
-                    ->date()
+                    ->color('primary'),
+                TextColumn::make('assignee.name')
+                    ->label('Assigned To')
                     ->sortable()
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('deed_generated_at')
+                    ->label('Generated')
+                    ->since()
+                    ->sortable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->since()
@@ -101,124 +101,111 @@ class DealsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make(),
-                SelectFilter::make('stage')
-                    ->options(Deal::STAGE_LABELS)
+                SelectFilter::make('deed_status')
+                    ->label('Deed Status')
+                    ->options(Deal::DEED_STATUS_LABELS)
                     ->multiple(),
-                SelectFilter::make('priority')
-                    ->options(Deal::PRIORITY_LABELS),
-                SelectFilter::make('deal_source')
-                    ->label('Source')
-                    ->options(Deal::SOURCE_LABELS),
                 SelectFilter::make('assigned_to')
                     ->label('Assigned To')
                     ->options(User::where('is_active', true)->pluck('name', 'id'))
                     ->searchable(),
             ])
             ->recordActions([
-                ViewAction::make(),
                 EditAction::make(),
 
-                // Quick stage advancement
-                Action::make('advanceStage')
-                    ->label(fn (Deal $record) => match ($record->stage) {
-                        'discovery'    => '→ Prospecting',
-                        'prospecting'  => '→ Proposal',
-                        'proposal'     => '→ Negotiation',
-                        'negotiation'  => '→ Contract',
-                        'contract'     => '🏆 Close Won',
-                        default        => '—',
-                    })
-                    ->icon(fn (Deal $record) => match ($record->stage) {
-                        'contract' => 'heroicon-o-trophy',
-                        default    => 'heroicon-o-arrow-right',
-                    })
-                    ->color(fn (Deal $record) => match ($record->stage) {
-                        'contract' => 'success',
-                        default    => 'info',
-                    })
+                // ★ Generate Deed
+                Action::make('generateDeed')
+                    ->label('📜 Generate Deed')
+                    ->icon('heroicon-o-document-check')
+                    ->color('primary')
                     ->requiresConfirmation()
+                    ->modalHeading('Generate Software Service Agreement?')
+                    ->modalDescription('এটি ডীড নম্বর তৈরি করবে। এরপর Edit করে তথ্য সম্পাদনা ও প্রিন্ট করতে পারবেন।')
                     ->action(function (Deal $record) {
-                        $nextStage = match ($record->stage) {
-                            'discovery'    => 'prospecting',
-                            'prospecting'  => 'proposal',
-                            'proposal'     => 'negotiation',
-                            'negotiation'  => 'contract',
-                            'contract'     => 'closed_won',
-                            default        => null,
-                        };
+                        $year = now()->format('Y');
+                        $count = Deal::where('deed_number', 'like', "DEED-{$year}-%")->count();
+                        $deedNumber = "DEED-{$year}-" . str_pad($count + 1, 4, '0', STR_PAD_LEFT);
 
-                        if ($nextStage) {
-                            $updates = [
-                                'stage'       => $nextStage,
-                                'probability' => Deal::STAGE_PROBABILITIES[$nextStage] ?? 0,
-                            ];
-                            if ($nextStage === 'closed_won') {
-                                $updates['closed_at'] = now();
-                            }
-                            $record->update($updates);
+                        $updateData = ['deed_number' => $deedNumber, 'deed_status' => 'draft'];
 
-                            Notification::make()
-                                ->title('Stage Updated')
-                                ->body("Deal moved to: " . (Deal::STAGE_LABELS[$nextStage] ?? $nextStage))
-                                ->success()
-                                ->send();
+                        // Auto-fill from client if available
+                        if ($record->client) {
+                            $updateData['deed_client_representative'] = $record->client->principal_name ?? $record->contact_name;
+                            $updateData['deed_client_address'] = $record->client->address;
                         }
-                    })
-                    ->visible(fn (Deal $record) => in_array($record->stage, Deal::KANBAN_STAGES)),
 
-                // Mark Lost
-                Action::make('markLost')
-                    ->label('Lost')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->modalHeading('Mark Deal as Lost?')
-                    ->action(function (Deal $record) {
-                        $record->update([
-                            'stage'       => 'closed_lost',
-                            'probability' => 0,
-                            'closed_at'   => now(),
-                        ]);
-                    })
-                    ->visible(fn (Deal $record) => !in_array($record->stage, ['closed_won', 'closed_lost'])),
+                        if (empty($record->deed_effective_date)) {
+                            $updateData['deed_effective_date'] = now();
+                            $updateData['deed_end_date'] = now()->addYears(2);
+                            $updateData['deed_duration'] = '2';
+                        }
 
-                // ★ Convert to Client — the key CRM flow action
-                Action::make('convertToClient')
-                    ->label('→ Create Client')
-                    ->icon('heroicon-o-building-office-2')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->modalHeading(fn (Deal $record) => 'Create Client from "' . $record->title . '"?')
-                    ->modalDescription('This will create a new Client record, close this deal as Won, and link everything together.')
-                    ->modalSubmitActionLabel('Create Client')
-                    ->form([
-                        Select::make('team_id')
-                            ->label('Assign Client to Team')
-                            ->options(Team::pluck('name', 'id'))
-                            ->searchable()
-                            ->preload()
-                            ->placeholder('Select team'),
-                    ])
-                    ->action(function (Deal $record, array $data) {
-                        $client = $record->convertToClient($data['team_id'] ?? null);
+                        $record->update($updateData);
+
+                        CrmActivity::log('deal', $record->id, 'system',
+                            "📜 Deed {$deedNumber} generated",
+                            'Software Service Agreement created'
+                        );
 
                         Notification::make()
-                            ->title('🎉 Client Created!')
-                            ->body("Client \"{$client->name}\" has been created! Deal closed as Won.")
+                            ->title("📜 Deed {$deedNumber} Generated!")
+                            ->body('Edit করে সম্পূর্ণ তথ্য দিন, তারপর Print করুন।')
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (Deal $record) =>
-                        !$record->isConverted()
-                        && $record->stage !== 'closed_lost'
-                    ),
+                    ->visible(fn (Deal $record) => in_array($record->deed_status, ['not_created', null])),
+
+                // ★ Print Deed
+                Action::make('printDeed')
+                    ->label('🖨️ Print')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray')
+                    ->url(fn (Deal $record) => route('crm.deed.print', $record->id), shouldOpenInNewTab: true)
+                    ->action(function (Deal $record) {
+                        if ($record->deed_status === 'draft') {
+                            $record->update(['deed_status' => 'generated', 'deed_generated_at' => now()]);
+                        }
+                    })
+                    ->visible(fn (Deal $record) => !in_array($record->deed_status, ['not_created', null])),
+
+                // ★ Mark as Signed
+                Action::make('markSigned')
+                    ->label('🖊️ Mark Signed')
+                    ->icon('heroicon-o-pencil-square')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Mark Deed as Signed?')
+                    ->action(function (Deal $record) {
+                        $record->update(['deed_status' => 'signed']);
+
+                        CrmActivity::log('deal', $record->id, 'status_change',
+                            "🖊️ Deed {$record->deed_number} marked as Signed"
+                        );
+
+                        Notification::make()->title('✅ Deed Signed!')->success()->send();
+                    })
+                    ->visible(fn (Deal $record) => $record->deed_status === 'generated'),
+
+                // ★ Mark Active
+                Action::make('markActive')
+                    ->label('🟢 Activate')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (Deal $record) {
+                        $record->update(['deed_status' => 'active']);
+
+                        CrmActivity::log('deal', $record->id, 'status_change',
+                            "🟢 Deed {$record->deed_number} activated"
+                        );
+
+                        Notification::make()->title('🟢 Deed Activated!')->success()->send();
+                    })
+                    ->visible(fn (Deal $record) => $record->deed_status === 'signed'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
