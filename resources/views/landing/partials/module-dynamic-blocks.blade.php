@@ -22,7 +22,7 @@
             <div class="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 w-full z-10">
                 <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
                     <div class="flex-1 max-w-2xl text-center lg:text-left">
-                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-5 leading-[1.1] slide-up-1 {{ empty($data['text_color']) ? 'text-white' : '' }}">
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl lg:leading-tight font-extrabold mb-5 leading-[1.1] slide-up-1 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 hover:scale-[1.02] transition-transform duration-500">
                             {{ $data['title'] ?? '' }}
                         </h1>
                         @if(!empty($data['subtitle']))
@@ -52,8 +52,8 @@
                     </div>
                     
                     @if(!empty($data['image']))
-                    <div class="flex-1 max-w-xl w-full scale-in-1">
-                        <img src="{{ Storage::disk($storageDisk)->url($data['image']) }}" class="w-full h-auto rounded-2xl shadow-2xl shadow-black/50 border border-white/10" alt="Hero Image">
+                    <div class="flex-1 max-w-xl w-full scale-in-1 group">
+                        <img src="{{ Storage::disk($storageDisk)->url($data['image']) }}" class="w-full h-auto rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] border border-white/20 group-hover:scale-[1.07] group-hover:-rotate-1 transition-all duration-700 ease-in-out" alt="Hero Image">
                     </div>
                     @endif
                 </div>
@@ -62,7 +62,7 @@
         </section>
 
     @elseif($block['type'] === 'features_grid')
-        <section class="{{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
                 <div class="text-center mb-16">
                     <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Features' }}</h2>
@@ -88,7 +88,7 @@
         </section>
 
     @elseif($block['type'] === 'rich_content')
-        <section class="{{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #ffffff;' }}">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #ffffff;' }}">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
                 <div class="flex flex-col {{ ($data['image_position'] ?? 'right') === 'left' ? 'lg:flex-row-reverse' : (($data['image_position'] ?? 'right') === 'top' ? '' : 'lg:flex-row') }} gap-12 items-center">
                     
@@ -109,7 +109,7 @@
         </section>
 
     @elseif($block['type'] === 'pricing')
-        <section class="{{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
                 <div class="text-center mb-16">
                     <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Pricing Plans' }}</h2>
@@ -153,15 +153,15 @@
         </section>
 
     @elseif($block['type'] === 'gallery')
-        <section class="{{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #ffffff;' }}">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #ffffff;' }}">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
                 <h2 class="text-3xl font-extrabold text-center mb-10 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Screenshots' }}</h2>
                 
                 @if(!empty($data['images']))
                 <div class="flex overflow-x-auto gap-6 pb-6 scrollbar-hide snap-x">
                     @foreach($data['images'] as $img)
-                    <div class="shrink-0 w-80 sm:w-96 snap-center">
-                        <img src="{{ Storage::disk($storageDisk)->url($img) }}" class="w-full h-auto rounded-xl shadow-lg border border-slate-200 object-cover aspect-video" alt="Screenshot">
+                    <div class="shrink-0 w-11/12 md:w-[600px] snap-center group">
+                        <img src="{{ Storage::disk($storageDisk)->url($img) }}" class="w-full h-[300px] md:h-[400px] rounded-2xl shadow-xl border border-slate-200 object-contain bg-slate-50 group-hover:scale-105 transition-transform duration-500 ease-out" alt="Screenshot">
                     </div>
                     @endforeach
                 </div>
@@ -170,7 +170,7 @@
         </section>
 
     @elseif($block['type'] === 'video_playlist')
-        <section class="{{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
                 <h2 class="text-3xl font-extrabold text-center mb-10 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Video Tutorials' }}</h2>
                 
@@ -195,7 +195,7 @@
         </section>
 
     @elseif($block['type'] === 'testimonials')
-        <section class="{{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #ffffff;' }}">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #ffffff;' }}">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
                 <h2 class="text-3xl font-extrabold text-center mb-10 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Testimonials' }}</h2>
                 
@@ -226,7 +226,7 @@
         </section>
 
     @elseif($block['type'] === 'faqs')
-        <section class="{{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
             <div class="max-w-3xl mx-auto px-5 sm:px-8">
                 <h2 class="text-3xl font-extrabold text-center mb-10 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'FAQs' }}</h2>
                 
@@ -249,7 +249,7 @@
         </section>
 
     @elseif($block['type'] === 'cta_banner')
-        <section class="relative overflow-hidden {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #0c1a3e 70%, #0f172a 100%);' }}">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out relative overflow-hidden {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #0c1a3e 70%, #0f172a 100%);' }}">
             @if(empty($data['bg_color']))
                 <div class="absolute inset-0 opacity-[0.06]" style="background-image: radial-gradient(rgba(99,102,241,.5) 1px, transparent 1px); background-size: 28px 28px;"></div>
             @endif
