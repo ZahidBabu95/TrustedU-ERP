@@ -129,7 +129,7 @@ return [
     */
 
     'temporary_file_upload' => [
-        'disk' => 'local',                                      // Force local disk for temp uploads (avoids CORS with R2/S3)
+        'disk' => 'public',                                     // Changed to 'public' to ensure permissions in cPanel live environment matched with deployment guide
         'rules' => 'file|max:102400',                           // Default was max:12288 (12MB), increased to 100MB to avoid 422 File size error
         'directory' => null,                                  // Example: 'tmp'                     | Default: 'livewire-tmp'
         'middleware' => null,                                 // Example: 'throttle:5,1'            | Default: 'throttle:60,1'
