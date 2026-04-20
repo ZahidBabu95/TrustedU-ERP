@@ -45,5 +45,8 @@
 * **Dynamic Classes:** ফিলামেন্ট থেকে আসা ব্যাকগ্রাউন্ড কালার, ইমেজ এবং অ্যানিমেশন স্টাইলগুলো Alpine.js এবং ইনলাইন CSS-এর মাধ্যমে ডাইনামিকভাবে রেন্ডার হবে।
 * **Responsive Design:** প্রতিটি ব্লক সব স্ক্রিন সাইজের জন্য 100% রেসপন্সিভ হবে।
 
----
-**Status:** In Progress 🚀
+**Status:** Completed ✅ 
+
+### Additional Fixes Implemented 
+* **Storage Logic Strategy:** Instead of routing images through S3/R2 Cloudflare (which caused CORS issues on previews and domain mismatches), the ERP Page Builder storage disk logic in `ErpModuleForm` was permanently hardcoded to `public`. This ensures extreme stability for `cPanel` and avoids 524 Cloudflare timeout issues during Git GUI deployment.
+* **Idempotent Migrations:** Fixed partial DDL migration failures by wrapping new column creations in `!Schema::hasColumn(...)` conditionals.
