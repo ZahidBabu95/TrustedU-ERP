@@ -45,12 +45,23 @@ class LandingPageController extends Controller
             return $video;
         })->filter(fn($v) => !empty($v['video_id']));
 
+        // Extract featured video (first one marked as featured, or first video)
+        $featuredVideo = $videos->firstWhere('is_featured', true) ?? $videos->first();
+
+        // Remaining videos (exclude featured from the list to avoid duplication)
+        $otherVideos = $videos->filter(function ($v) use ($featuredVideo) {
+            if (!$featuredVideo) return true;
+            return $v['video_id'] !== $featuredVideo['video_id'];
+        });
+
         // All other active modules for sidebar navigation
         $allModules = ErpModule::active()->ordered()->get();
 
         $settings = Setting::pluck('value', 'key')->toArray();
 
-        return view('landing.module-detail', compact('module', 'videos', 'allModules', 'settings'));
+        return view('landing.module-detail', compact(
+            'module', 'videos', 'featuredVideo', 'otherVideos', 'allModules', 'settings'
+        ));
     }
 
     /**

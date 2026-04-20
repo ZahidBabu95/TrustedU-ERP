@@ -10,14 +10,19 @@ use Illuminate\Support\Str;
 class ErpModule extends Model
 {
     protected $fillable = [
-        'name', 'slug', 'icon', 'description', 'long_description',
-        'features', 'youtube_videos', 'color', 'is_active', 'sort_order',
+        'name', 'slug', 'icon', 'icon_image', 'description', 'long_description',
+        'hero_subtitle', 'hero_image',
+        'features', 'youtube_videos',
+        'download_url', 'download_label',
+        'color', 'is_active', 'sort_order',
+        'dynamic_sections',
     ];
 
     protected $casts = [
-        'features'       => 'array',
-        'youtube_videos' => 'array',
-        'is_active'      => 'boolean',
+        'features'         => 'array',
+        'youtube_videos'   => 'array',
+        'dynamic_sections' => 'array',
+        'is_active'        => 'boolean',
     ];
 
     protected static function booted(): void
