@@ -9,8 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('leads', function (Blueprint $table) {
-            $table->json('contact_report')->nullable();
-            $table->timestamp('status_changed_at')->nullable();
+            if (!Schema::hasColumn('leads', 'contact_report')) {
+                $table->json('contact_report')->nullable();
+            }
+            if (!Schema::hasColumn('leads', 'status_changed_at')) {
+                $table->timestamp('status_changed_at')->nullable();
+            }
         });
     }
 
