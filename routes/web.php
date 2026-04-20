@@ -179,3 +179,14 @@ Route::prefix('chatbot')->group(function () {
     Route::post('/message', [ChatBotController::class, 'sendMessage']);
     Route::post('/visitor-info', [ChatBotController::class, 'updateVisitorInfo']);
 });
+
+Route::get('/system-diagnostics', function () {
+    return [
+        'upload_max_filesize' => ini_get('upload_max_filesize'),
+        'post_max_size' => ini_get('post_max_size'),
+        'memory_limit' => ini_get('memory_limit'),
+        'sys_get_temp_dir' => sys_get_temp_dir(),
+        'livewire_temp_disk' => config('livewire.temporary_file_upload.disk'),
+        'is_temp_writable' => is_writable(sys_get_temp_dir())
+    ];
+});
