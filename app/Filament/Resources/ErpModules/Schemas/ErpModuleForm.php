@@ -77,11 +77,9 @@ class ErpModuleForm
                                 ])->default('blue')->native(false),
 
                             FileUpload::make('icon_image')
-                                ->label('Module Icon (Image)')
-                                ->image()
+                                ->label('Module Icon (Image/File)')
                                 ->disk(self::getStorageDisk())
                                 ->directory('modules/icons')
-                                ->maxSize(1024)
                                 ->columnSpanFull(),
 
                             Textarea::make('description')
@@ -95,7 +93,7 @@ class ErpModuleForm
                         ->schema([
                             Section::make('Hero Section (Legacy)')->schema([
                                 TextInput::make('hero_subtitle')->maxLength(300),
-                                FileUpload::make('hero_image')->image()->disk(self::getStorageDisk())->directory('modules/hero')->maxSize(2048),
+                                FileUpload::make('hero_image')->disk(self::getStorageDisk())->directory('modules/hero'),
                             ])->columns(2),
                             TagsInput::make('features')->label('Key Features (Legacy)')->columnSpanFull(),
                             Repeater::make('youtube_videos')
@@ -118,7 +116,7 @@ class ErpModuleForm
                                         ->schema(array_merge([
                                             TextInput::make('title')->label('Hero Title')->required(),
                                             Textarea::make('subtitle')->label('Hero Subtitle')->rows(2),
-                                            FileUpload::make('image')->label('Hero Image')->image()->disk(self::getStorageDisk())->directory('modules/builder'),
+                                            FileUpload::make('image')->label('Hero Image/Media')->disk(self::getStorageDisk())->directory('modules/builder'),
                                             Repeater::make('buttons')
                                                 ->schema([
                                                     TextInput::make('label')->required(),
@@ -148,7 +146,7 @@ class ErpModuleForm
                                         ->schema(array_merge([
                                             TextInput::make('section_title')->label('Title'),
                                             RichEditor::make('content')->label('Main Content')->required(),
-                                            FileUpload::make('image')->image()->disk(self::getStorageDisk())->directory('modules/content'),
+                                            FileUpload::make('image')->label('Media/File')->disk(self::getStorageDisk())->directory('modules/content'),
                                             Select::make('image_position')
                                                 ->options(['left' => 'Image on Left', 'right' => 'Image on Right', 'top' => 'Image on Top'])
                                                 ->default('right'),
@@ -177,7 +175,7 @@ class ErpModuleForm
                                         ->icon('heroicon-o-photo')
                                         ->schema(array_merge([
                                             TextInput::make('section_title')->default('Screenshots'),
-                                            FileUpload::make('images')->multiple()->image()->disk(self::getStorageDisk())->directory('modules/gallery')->reorderable()->appendFiles(),
+                                            FileUpload::make('images')->multiple()->disk(self::getStorageDisk())->directory('modules/gallery')->reorderable()->appendFiles(),
                                         ], self::getDesignSchema())),
 
                                     Block::make('video_playlist')
@@ -203,7 +201,7 @@ class ErpModuleForm
                                                     TextInput::make('client_name')->required(),
                                                     TextInput::make('designation')->required(),
                                                     Textarea::make('review')->required()->rows(3),
-                                                    FileUpload::make('avatar')->image()->avatar()->disk(self::getStorageDisk())->directory('modules/avatars'),
+                                                    FileUpload::make('avatar')->disk(self::getStorageDisk())->directory('modules/avatars'),
                                                 ])->columns(2),
                                         ], self::getDesignSchema())),
 
