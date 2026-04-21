@@ -312,6 +312,58 @@
             </div>
         </section>
 
+    @elseif($block['type'] === 'resources')
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Download Resources' }}</h2>
+                    @if(!empty($data['section_subtitle']))
+                        <p class="max-w-2xl mx-auto text-lg {{ empty($data['text_color']) ? 'text-slate-500' : 'opacity-80' }}">{{ $data['section_subtitle'] }}</p>
+                    @endif
+                </div>
+                
+                @if(!empty($data['items']))
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($data['items'] as $item)
+                        @php
+                            $isExternal = !empty($item['external_url']);
+                            $url = $isExternal ? $item['external_url'] : (!empty($item['file']) ? Storage::disk($storageDisk)->url($item['file']) : '#');
+                            $isPdf = !$isExternal && !empty($item['file']) && Str::endsWith($item['file'], '.pdf');
+                            $isZip = !$isExternal && !empty($item['file']) && Str::endsWith($item['file'], '.zip');
+                        @endphp
+                        <a href="{{ $url }}" target="_blank" class="group flex items-center p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300">
+                            <!-- Icon Box -->
+                            <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 mr-5 transition-colors {{ $isExternal ? 'bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white' : ($isPdf ? 'bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white') }}">
+                                @if($isExternal)
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                @elseif($isPdf)
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                @else
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                @endif
+                            </div>
+                            <!-- Text Details -->
+                            <div class="flex-1 overflow-hidden">
+                                <h4 class="text-lg font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">{{ $item['title'] ?? 'Download File' }}</h4>
+                                @if(!empty($item['description']))
+                                    <p class="text-sm text-slate-500 mt-0.5 truncate">{{ $item['description'] }}</p>
+                                @elseif($isExternal)
+                                    <p class="text-sm text-slate-400 mt-0.5 truncate">External Link</p>
+                                @else
+                                    <p class="text-sm text-slate-400 mt-0.5 truncate uppercase">{{ pathinfo($item['file'], PATHINFO_EXTENSION) }} File</p>
+                                @endif
+                            </div>
+                            <!-- Download Arrow -->
+                            <div class="w-8 flex items-center justify-end text-slate-300 group-hover:text-blue-600 transition-colors">
+                                <svg class="w-5 h-5 group-hover:translate-x-1 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+        </section>
+
     @elseif($block['type'] === 'testimonials')
         <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #ffffff;' }}">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">

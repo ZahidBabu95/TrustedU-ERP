@@ -201,6 +201,28 @@ class ErpModuleForm
                                                 ])->columns(2),
                                         ], self::getDesignSchema())),
 
+                                    Block::make('resources')
+                                        ->label('Downloadable Resources')
+                                        ->icon('heroicon-o-arrow-down-tray')
+                                        ->schema(array_merge([
+                                            TextInput::make('section_title')->default('Download Resources & Documents'),
+                                            Textarea::make('section_subtitle')->rows(2),
+                                            Repeater::make('items')
+                                                ->label('Resource Files/Links')
+                                                ->schema([
+                                                    TextInput::make('title')->label('Resource Name (e.g. User Manual)')->required(),
+                                                    TextInput::make('description')->label('Short Info (e.g. PDF - 2MB)'),
+                                                    FileUpload::make('file')
+                                                        ->label('Upload File (PDF, ZIP, etc.)')
+                                                        ->disk(self::getStorageDisk())
+                                                        ->directory('modules/resources')
+                                                        ->preserveFilenames(),
+                                                    TextInput::make('external_url')
+                                                        ->label('OR External Link (Google Drive)')
+                                                        ->url(),
+                                                ])->columns(2),
+                                        ], self::getDesignSchema())),
+
                                     Block::make('testimonials')
                                         ->label('Testimonials')
                                         ->icon('heroicon-o-chat-bubble-bottom-center-text')
