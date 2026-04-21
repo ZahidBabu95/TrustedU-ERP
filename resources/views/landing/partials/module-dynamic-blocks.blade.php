@@ -62,24 +62,35 @@
         </section>
 
     @elseif($block['type'] === 'features_grid')
-        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out relative overflow-hidden {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
+            <!-- Background Decoration -->
+            <div class="absolute inset-0 z-0 pointer-events-none opacity-50" style="background-image: radial-gradient(rgba(100, 116, 139, 0.08) 1px, transparent 1px); background-size: 32px 32px;"></div>
+            
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 relative z-10">
                 <div class="text-center mb-16">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Features' }}</h2>
+                    <h2 class="text-4xl sm:text-5xl font-extrabold mb-4 tracking-tight {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Key Features' }}</h2>
                     @if(!empty($data['section_subtitle']))
-                        <p class="max-w-2xl mx-auto text-lg {{ empty($data['text_color']) ? 'text-slate-500' : 'opacity-80' }}">{{ $data['section_subtitle'] }}</p>
+                        <p class="max-w-2xl mx-auto text-lg md:text-xl {{ empty($data['text_color']) ? 'text-slate-500' : 'opacity-80' }} leading-relaxed">{{ $data['section_subtitle'] }}</p>
                     @endif
                 </div>
                 
                 @if(!empty($data['features']))
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach($data['features'] as $feature)
-                    <div class="bg-white/90 backdrop-blur rounded-2xl border border-slate-200 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 mb-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <div class="group relative bg-white rounded-3xl border border-slate-100 p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(37,99,235,0.08)] hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+                        <!-- Card Hover Decoration -->
+                        <div class="absolute -top-12 -right-12 w-40 h-40 bg-gradient-to-br from-blue-100 to-indigo-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl"></div>
+                        
+                        <div class="relative z-10">
+                            <!-- Icon -->
+                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-500 text-white mb-8 shadow-lg shadow-blue-500/30 transform group-hover:rotate-6 group-hover:scale-105 transition-all duration-300">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            
+                            <!-- Text -->
+                            <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">{{ $feature['title'] ?? '' }}</h3>
+                            <p class="text-slate-500 text-sm md:text-base leading-relaxed">{{ $feature['description'] ?? '' }}</p>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">{{ $feature['title'] ?? '' }}</h3>
-                        <p class="text-slate-500 text-sm leading-relaxed">{{ $feature['description'] ?? '' }}</p>
                     </div>
                     @endforeach
                 </div>
@@ -153,17 +164,26 @@
         </section>
 
     @elseif($block['type'] === 'gallery')
-        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #ffffff;' }}">
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
-                <h2 class="text-3xl font-extrabold text-center mb-10 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Screenshots' }}</h2>
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out relative z-10 {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #fafbfc;' }}">
+            <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-center mb-14 tracking-tight {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Templates & Previews' }}</h2>
                 
                 @if(!empty($data['images']))
-                <div class="flex overflow-x-auto gap-6 pb-6 scrollbar-hide snap-x">
-                    @foreach($data['images'] as $img)
-                    <div class="shrink-0 w-11/12 md:w-[600px] snap-center group">
-                        <img src="{{ Storage::disk($storageDisk)->url($img) }}" class="w-full h-[300px] md:h-[400px] rounded-2xl shadow-xl border border-slate-200 object-contain bg-slate-50 group-hover:scale-105 transition-transform duration-500 ease-out" alt="Screenshot">
+                <div class="relative">
+                    <!-- Smooth Gradients for edges -->
+                    <div class="absolute left-0 top-0 bottom-0 w-8 md:w-20 bg-gradient-to-r from-[{{ $data['bg_color'] ?? '#fafbfc' }}] to-transparent z-10 pointer-events-none"></div>
+                    <div class="absolute right-0 top-0 bottom-0 w-8 md:w-20 bg-gradient-to-l from-[{{ $data['bg_color'] ?? '#fafbfc' }}] to-transparent z-10 pointer-events-none"></div>
+                    
+                    <div class="flex overflow-x-auto gap-8 md:gap-12 pb-12 pt-6 px-4 scrollbar-hide snap-x snap-mandatory">
+                        @foreach($data['images'] as $img)
+                        <div class="shrink-0 w-[85vw] sm:w-[600px] lg:w-[700px] snap-center group relative cursor-pointer">
+                            <!-- Premium Glass Container -->
+                            <div class="relative bg-white/60 backdrop-blur-md rounded-3xl p-3 sm:p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-200 hover:shadow-[0_20px_50px_rgb(37,99,235,0.15)] hover:-translate-y-2 transition-all duration-700 ease-out overflow-hidden flex justify-center items-center">
+                                <img src="{{ Storage::disk($storageDisk)->url($img) }}" class="w-full h-[400px] md:h-[600px] rounded-2xl object-contain bg-white" alt="Template Preview">
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
-                    @endforeach
                 </div>
                 @endif
             </div>
@@ -313,17 +333,20 @@
         </section>
 
     @elseif($block['type'] === 'resources')
-        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }} relative overflow-hidden" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
+            <!-- Background mesh -->
+            <div class="absolute inset-0 z-0 pointer-events-none opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%230f172a\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 relative z-10">
                 <div class="text-center mb-16">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Download Resources' }}</h2>
+                    <h2 class="text-4xl sm:text-5xl font-extrabold mb-4 tracking-tight {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Download Resources' }}</h2>
                     @if(!empty($data['section_subtitle']))
-                        <p class="max-w-2xl mx-auto text-lg {{ empty($data['text_color']) ? 'text-slate-500' : 'opacity-80' }}">{{ $data['section_subtitle'] }}</p>
+                        <p class="max-w-2xl mx-auto text-lg md:text-xl {{ empty($data['text_color']) ? 'text-slate-500' : 'opacity-80' }} leading-relaxed">{{ $data['section_subtitle'] }}</p>
                     @endif
                 </div>
                 
                 @if(!empty($data['items']))
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach($data['items'] as $item)
                         @php
                             $isExternal = !empty($item['external_url']);
@@ -331,31 +354,43 @@
                             $isPdf = !$isExternal && !empty($item['file']) && Str::endsWith($item['file'], '.pdf');
                             $isZip = !$isExternal && !empty($item['file']) && Str::endsWith($item['file'], '.zip');
                         @endphp
-                        <a href="{{ $url }}" target="_blank" class="group flex items-center p-5 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300">
-                            <!-- Icon Box -->
-                            <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 mr-5 transition-colors {{ $isExternal ? 'bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white' : ($isPdf ? 'bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white') }}">
+                        <a href="{{ $url }}" target="_blank" class="group relative flex items-center p-6 bg-white rounded-3xl border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(37,99,235,0.08)] hover:-translate-y-2 transition-all duration-500 overflow-hidden z-10">
+                            <!-- Hover Gradient Background -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+                            
+                            <!-- Premium Icon Box -->
+                            <div class="w-16 h-16 rounded-[1.25rem] flex items-center justify-center shrink-0 mr-6 transition-all duration-500 border border-white shadow-inner shadow-slate-200 {{ $isExternal ? 'bg-gradient-to-br from-green-100 to-green-50 text-green-600 group-hover:from-green-500 group-hover:to-emerald-600 group-hover:text-white group-hover:shadow-green-500/30' : ($isPdf ? 'bg-gradient-to-br from-red-100 to-red-50 text-red-600 group-hover:from-red-500 group-hover:to-rose-600 group-hover:text-white group-hover:shadow-red-500/30' : 'bg-gradient-to-br from-blue-100 to-blue-50 text-blue-600 group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white group-hover:shadow-blue-500/30') }}">
                                 @if($isExternal)
-                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                    <svg class="w-8 h-8 transform group-hover:-rotate-12 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                                 @elseif($isPdf)
-                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <svg class="w-8 h-8 group-hover:scale-110 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 @else
-                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <svg class="w-8 h-8 group-hover:translate-y-1 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 @endif
                             </div>
+                            
                             <!-- Text Details -->
                             <div class="flex-1 overflow-hidden">
-                                <h4 class="text-lg font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">{{ $item['title'] ?? 'Download File' }}</h4>
+                                <h4 class="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">{{ $item['title'] ?? 'Download File' }}</h4>
                                 @if(!empty($item['description']))
-                                    <p class="text-sm text-slate-500 mt-0.5 truncate">{{ $item['description'] }}</p>
+                                    <p class="text-sm font-medium text-slate-500 mt-1 truncate">{{ $item['description'] }}</p>
                                 @elseif($isExternal)
-                                    <p class="text-sm text-slate-400 mt-0.5 truncate">External Link</p>
+                                    <p class="text-sm font-medium text-slate-400 mt-1 truncate">External Resource Link</p>
                                 @else
-                                    <p class="text-sm text-slate-400 mt-0.5 truncate uppercase">{{ pathinfo($item['file'], PATHINFO_EXTENSION) }} File</p>
+                                    <p class="text-sm font-medium text-slate-400 mt-1 truncate uppercase flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $isPdf ? 'bg-red-400' : 'bg-blue-400' }}"></span>
+                                        {{ pathinfo($item['file'], PATHINFO_EXTENSION) }} Format
+                                    </p>
                                 @endif
                             </div>
-                            <!-- Download Arrow -->
-                            <div class="w-8 flex items-center justify-end text-slate-300 group-hover:text-blue-600 transition-colors">
-                                <svg class="w-5 h-5 group-hover:translate-x-1 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            
+                            <!-- Download Arrow / Link Arrow -->
+                            <div class="w-10 flex items-center justify-end text-slate-300 group-hover:text-blue-600 transition-colors">
+                                @if($isExternal)
+                                    <svg class="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                @else
+                                    <svg class="w-6 h-6 group-hover:translate-y-1 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                @endif
                             </div>
                         </a>
                     @endforeach
