@@ -187,37 +187,63 @@
             }
             $isDark = empty($data['bg_color']); 
             
+            // Smart Fallback: if user put text inside video description instead of the section subtitle
+            $subtitleToUse = !empty($data['section_subtitle']) ? $data['section_subtitle'] : ($featuredVideo['description'] ?? '');
+            $vidDesc = ($subtitleToUse === ($featuredVideo['description'] ?? '')) ? null : ($featuredVideo['description'] ?? '');
+
             if (!function_exists('getYoutubeIdFromUrl')) {
                 function getYoutubeIdFromUrl($url) {
                     preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})%i', $url, $match);
-                    return $match[1] ?? $url; // Return extracted ID or fallback to the original string if no match
+                    return $match[1] ?? $url;
                 }
             }
         @endphp
 
-        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #0b1121; color: white;' }}">
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }} relative overflow-hidden" style="{{ $wrapperStyle ?: 'background-color: #050b14; color: white;' }}">
+            
+            <!-- Premium Background Effects -->
+            @if($isDark)
+            <div class="absolute inset-0 z-0 pointer-events-none">
+                <div class="absolute top-1/4 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl mix-blend-screen"></div>
+                <div class="absolute bottom-1/4 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl mix-blend-screen"></div>
+                <div class="absolute inset-0" style="background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 32px 32px;"></div>
+            </div>
+            @endif
+
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 relative z-10">
                 
                 @if($featuredVideo)
-                <div class="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center mb-16">
+                <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center mb-24">
                     <!-- Left Content -->
                     <div class="flex-1 w-full text-center lg:text-left {{ empty($data['text_color']) ? ($isDark ? 'text-white' : 'text-slate-900') : '' }}">
-                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">{{ $data['section_title'] ?? 'Experience the Platform' }}</h2>
                         
-                        @if(!empty($data['section_subtitle']))
-                        <p class="text-lg mb-8 {{ empty($data['text_color']) ? ($isDark ? 'text-slate-300' : 'text-slate-600') : 'opacity-80' }} leading-relaxed">
-                            {{ $data['section_subtitle'] }}
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold mb-6 shadow-inner shadow-blue-500/10">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                            </span>
+                            Tutorial Showcase
+                        </div>
+
+                        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-8 leading-[1.15] tracking-tight text-transparent bg-clip-text bg-gradient-to-r {{ $isDark ? 'from-white via-slate-200 to-slate-400' : 'from-slate-900 via-slate-800 to-slate-600' }}">
+                            {{ $data['section_title'] ?? 'Experience the Platform' }}
+                        </h2>
+                        
+                        @if(!empty($subtitleToUse))
+                        <p class="text-lg md:text-xl mb-10 {{ empty($data['text_color']) ? ($isDark ? 'text-slate-300' : 'text-slate-600') : 'opacity-80' }} leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                            <!-- Parse Checkmarks roughly if they pasted it here -->
+                            {!! str_replace('✓', '<br><span class="text-blue-400 font-bold">✓</span>', e($subtitleToUse)) !!}
                         </p>
                         @endif
 
-                        @if(!empty($data['features']))
-                        <ul class="space-y-4 mb-10 mx-auto lg:mx-0 inline-block text-left w-full max-w-sm">
+                        @if(!empty($data['features']) && count($data['features']) > 0)
+                        <ul class="space-y-5 mb-10 mx-auto lg:mx-0 inline-block text-left w-full max-w-sm">
                             @foreach($data['features'] as $feature)
-                            <li class="flex items-center gap-3">
-                                <div class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/30">
+                            <li class="flex items-start gap-4">
+                                <div class="mt-1 w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/40 border border-blue-400">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                 </div>
-                                <span class="text-base {{ empty($data['text_color']) ? ($isDark ? 'text-slate-200' : 'text-slate-700') : 'opacity-90' }}">{{ $feature['text'] ?? '' }}</span>
+                                <span class="text-lg font-medium {{ empty($data['text_color']) ? ($isDark ? 'text-slate-200' : 'text-slate-700') : 'opacity-90' }}">{{ $feature['text'] ?? '' }}</span>
                             </li>
                             @endforeach
                         </ul>
@@ -225,27 +251,31 @@
 
                         @if(!empty($data['button_label']) && !empty($data['button_url']))
                         <div class="flex justify-center lg:justify-start">
-                            <a href="{{ $data['button_url'] }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-white text-sm bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:-translate-y-1">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                {{ $data['button_label'] }}
+                            <a href="{{ $data['button_url'] }}" class="group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-white text-base overflow-hidden bg-blue-600 transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(37,99,235,0.4)] border border-blue-500/50">
+                                <span class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 transition-all group-hover:scale-110"></span>
+                                <svg class="relative w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span class="relative">{{ $data['button_label'] }}</span>
                             </a>
                         </div>
                         @endif
                     </div>
 
                     <!-- Right Featured Video -->
-                    <div class="flex-1 w-full max-w-3xl">
-                        <div class="bg-slate-800/40 p-2 sm:p-4 rounded-3xl border border-slate-700/50 shadow-2xl relative group">
-                            <!-- Glowing background effect -->
-                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-3xl opacity-20 group-hover:opacity-40 blur transition duration-500"></div>
+                    <div class="flex-1 w-full max-w-3xl relative">
+                        <div class="relative z-10 p-2 sm:p-3 rounded-[2rem] bg-slate-800/40 border border-slate-700/50 backdrop-blur-xl shadow-2xl">
+                            <!-- Premium Glow behind iframe -->
+                            <div class="absolute -inset-4 bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 rounded-[3rem] opacity-20 blur-2xl group-hover:opacity-40 transition duration-700 pointer-events-none"></div>
                             
-                            <div class="relative bg-black rounded-2xl overflow-hidden aspect-video shadow-2xl border border-slate-700/80">
-                                <iframe src="https://www.youtube.com/embed/{{ getYoutubeIdFromUrl($featuredVideo['youtube_id']) }}?rel=0" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                            <div class="relative bg-black/80 rounded-[1.5rem] overflow-hidden aspect-video shadow-inner shadow-white/10 ring-1 ring-white/10">
+                                <iframe src="https://www.youtube.com/embed/{{ getYoutubeIdFromUrl($featuredVideo['youtube_id']) }}?rel=0" class="w-full h-full absolute inset-0" frameborder="0" allowfullscreen></iframe>
                             </div>
                         </div>
-                        @if(!empty($featuredVideo['description']))
-                        <div class="mt-4 text-center">
-                            <p class="{{ empty($data['text_color']) ? ($isDark ? 'text-slate-400' : 'text-slate-600') : 'opacity-80' }} text-sm">{{ $featuredVideo['description'] }}</p>
+                        @if(!empty($vidDesc))
+                        <div class="mt-6 text-center lg:text-left ml-4">
+                            <p class="{{ empty($data['text_color']) ? ($isDark ? 'text-slate-400' : 'text-slate-600') : 'opacity-80' }} text-sm flex items-center justify-center lg:justify-start gap-2">
+                                <svg class="w-4 h-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {!! str_replace('✓', '<br><span class="text-blue-400 font-bold">✓</span>', e($vidDesc)) !!}
+                            </p>
                         </div>
                         @endif
                     </div>
