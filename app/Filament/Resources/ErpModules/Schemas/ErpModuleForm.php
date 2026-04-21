@@ -179,16 +179,26 @@ class ErpModuleForm
                                         ], self::getDesignSchema())),
 
                                     Block::make('video_playlist')
-                                        ->label('Video Tutorials')
+                                        ->label('Featured Video & Playlist')
                                         ->icon('heroicon-o-play')
                                         ->schema(array_merge([
-                                            TextInput::make('section_title')->default('Video Tutorials'),
-                                            Repeater::make('videos')
+                                            TextInput::make('section_title')->label('Main Heading')->default('Experience the Platform'),
+                                            Textarea::make('section_subtitle')->label('Description')->rows(2),
+                                            Repeater::make('features')
+                                                ->label('Highlight Checkmarks (Left Side)')
                                                 ->schema([
-                                                    TextInput::make('title')->required(),
-                                                    TextInput::make('youtube_id')->label('YouTube ID')->required(),
-                                                    Textarea::make('description')->rows(2),
+                                                    TextInput::make('text')->required()->label('Point Text'),
                                                 ])->columns(1),
+                                            TextInput::make('button_label')->label('Button Text (Optional)')->default('Watch Video Tutorials'),
+                                            TextInput::make('button_url')->label('Button URL (Optional)'),
+                                            Repeater::make('videos')
+                                                ->label('Videos List')
+                                                ->schema([
+                                                    Toggle::make('is_featured')->label('⭐ Set as Featured Video')->default(false)->columnSpanFull(),
+                                                    TextInput::make('title')->required(),
+                                                    TextInput::make('youtube_id')->label('YouTube URL or Video ID')->required(),
+                                                    Textarea::make('description')->rows(2)->columnSpanFull(),
+                                                ])->columns(2),
                                         ], self::getDesignSchema())),
 
                                     Block::make('testimonials')

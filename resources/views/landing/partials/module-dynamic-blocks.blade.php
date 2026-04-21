@@ -170,26 +170,114 @@
         </section>
 
     @elseif($block['type'] === 'video_playlist')
-        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #f8fafc;' }}">
+        @php
+            $videos = $data['videos'] ?? [];
+            $featuredVideo = null;
+            $playlistVideos = [];
+            foreach($videos as $vid) {
+                if(!empty($vid['is_featured']) && !$featuredVideo) {
+                    $featuredVideo = $vid;
+                } else {
+                    $playlistVideos[] = $vid;
+                }
+            }
+            if(!$featuredVideo && count($videos) > 0) {
+                $featuredVideo = $videos[0];
+                $playlistVideos = array_slice($videos, 1);
+            }
+            $isDark = empty($data['bg_color']); 
+            
+            if (!function_exists('getYoutubeIdFromUrl')) {
+                function getYoutubeIdFromUrl($url) {
+                    preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})%i', $url, $match);
+                    return $match[1] ?? $url; // Return extracted ID or fallback to the original string if no match
+                }
+            }
+        @endphp
+
+        <section x-data="{ shown: false }" x-intersect.half.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="transition-all duration-1000 ease-out {{ $paddingY }} {{ $customClasses }}" style="{{ $wrapperStyle ?: 'background-color: #0b1121; color: white;' }}">
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
-                <h2 class="text-3xl font-extrabold text-center mb-10 {{ empty($data['text_color']) ? 'text-slate-900' : '' }}">{{ $data['section_title'] ?? 'Video Tutorials' }}</h2>
                 
-                @if(!empty($data['videos']))
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($data['videos'] as $vid)
-                    <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-lg transition-shadow">
-                        <div class="aspect-video">
-                            <iframe src="https://www.youtube.com/embed/{{ $vid['youtube_id'] }}?rel=0" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                @if($featuredVideo)
+                <div class="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center mb-16">
+                    <!-- Left Content -->
+                    <div class="flex-1 w-full text-center lg:text-left {{ empty($data['text_color']) ? ($isDark ? 'text-white' : 'text-slate-900') : '' }}">
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">{{ $data['section_title'] ?? 'Experience the Platform' }}</h2>
+                        
+                        @if(!empty($data['section_subtitle']))
+                        <p class="text-lg mb-8 {{ empty($data['text_color']) ? ($isDark ? 'text-slate-300' : 'text-slate-600') : 'opacity-80' }} leading-relaxed">
+                            {{ $data['section_subtitle'] }}
+                        </p>
+                        @endif
+
+                        @if(!empty($data['features']))
+                        <ul class="space-y-4 mb-10 mx-auto lg:mx-0 inline-block text-left w-full max-w-sm">
+                            @foreach($data['features'] as $feature)
+                            <li class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/30">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <span class="text-base {{ empty($data['text_color']) ? ($isDark ? 'text-slate-200' : 'text-slate-700') : 'opacity-90' }}">{{ $feature['text'] ?? '' }}</span>
+                            </li>
+                            @endforeach
+                        </ul>
+                        @endif
+
+                        @if(!empty($data['button_label']) && !empty($data['button_url']))
+                        <div class="flex justify-center lg:justify-start">
+                            <a href="{{ $data['button_url'] }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-white text-sm bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:-translate-y-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                {{ $data['button_label'] }}
+                            </a>
                         </div>
-                        <div class="p-4">
-                            <h4 class="font-bold text-slate-800 line-clamp-1">{{ $vid['title'] ?? 'Video' }}</h4>
-                            @if(!empty($vid['description']))
-                            <p class="text-xs text-slate-500 mt-1 line-clamp-2">{{ $vid['description'] }}</p>
-                            @endif
+                        @endif
+                    </div>
+
+                    <!-- Right Featured Video -->
+                    <div class="flex-1 w-full max-w-3xl">
+                        <div class="bg-slate-800/40 p-2 sm:p-4 rounded-3xl border border-slate-700/50 shadow-2xl relative group">
+                            <!-- Glowing background effect -->
+                            <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-3xl opacity-20 group-hover:opacity-40 blur transition duration-500"></div>
+                            
+                            <div class="relative bg-black rounded-2xl overflow-hidden aspect-video shadow-2xl border border-slate-700/80">
+                                <iframe src="https://www.youtube.com/embed/{{ getYoutubeIdFromUrl($featuredVideo['youtube_id']) }}?rel=0" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                        @if(!empty($featuredVideo['description']))
+                        <div class="mt-4 text-center">
+                            <p class="{{ empty($data['text_color']) ? ($isDark ? 'text-slate-400' : 'text-slate-600') : 'opacity-80' }} text-sm">{{ $featuredVideo['description'] }}</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @else
+                    <!-- Fallback if no videos exist but title does -->
+                    <h2 class="text-3xl font-extrabold text-center mb-10 {{ empty($data['text_color']) ? ($isDark ? 'text-white' : 'text-slate-900') : '' }}">{{ $data['section_title'] ?? 'Video Tutorials' }}</h2>
+                @endif
+                
+                <!-- Playlist Sub-grid -->
+                @if(count($playlistVideos) > 0)
+                    <div class="border-t {{ $isDark ? 'border-slate-800/80' : 'border-slate-200' }} pt-12 mt-12 mb-6">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-2xl font-bold {{ empty($data['text_color']) ? ($isDark ? 'text-white' : 'text-slate-900') : '' }}">More Video Tutorials</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            @foreach($playlistVideos as $vid)
+                            <div class="{{ $isDark ? 'bg-white/5 border-slate-700/50' : 'bg-white border-slate-200' }} border rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all group">
+                                <div class="aspect-video relative overflow-hidden bg-black">
+                                    <iframe src="https://www.youtube.com/embed/{{ getYoutubeIdFromUrl($vid['youtube_id']) }}?rel=0" class="w-full h-full relative z-10" frameborder="0" allowfullscreen loading="lazy"></iframe>
+                                </div>
+                                <div class="p-5">
+                                    <h4 class="font-bold text-lg mb-2 {{ empty($data['text_color']) ? ($isDark ? 'text-white' : 'text-slate-900') : '' }} group-hover:text-blue-500 transition-colors line-clamp-1">{{ $vid['title'] ?? 'Video' }}</h4>
+                                    @if(!empty($vid['description']))
+                                    <p class="text-sm {{ empty($data['text_color']) ? ($isDark ? 'text-slate-400' : 'text-slate-500') : 'opacity-80' }} line-clamp-2">{{ $vid['description'] }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                            @endforeach
                         </div>
                     </div>
-                    @endforeach
-                </div>
                 @endif
             </div>
         </section>
